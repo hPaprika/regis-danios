@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escáner de Maletas Dañadas</title>
+  <link rel="stylesheet" href="./src/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Escáner de Maletas Dañadas</h1>
+    <p>Apunta la cámara al código de barras de la maleta</p>
+  </header>
+
+  <!-- Contenedor del escáner -->
+  <section id="scanner-section">
+    <div id="scanner-container">
+      <video id="video" autoplay playsinline></video>
+      <div id="scanner-status">Iniciando cámara...</div>
+    </div>
+  </section>
+
+  <!-- Lista de maletas escaneadas -->
+  <section id="lista-section">
+    <h2>Maletas Escaneadas</h2>
+    <ul id="lista-maletas" class="maletas-lista"></ul>
+    
+    <!-- Botones de acción -->
+    <div id="acciones">
+      <button id="btn-enviar" class="btn btn-primary" disabled>Enviar Registros</button>
+      <button id="btn-vaciar" class="btn btn-secondary">Vaciar Todo</button>
+    </div>
+  </section>
+
+  <!-- Modal para observaciones -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal-observaciones">
+      <h3>Observaciones</h3>
+      <textarea 
+        id="observaciones-textarea" 
+        placeholder="Describe detalles específicos del daño..."
+        rows="4"
+      ></textarea>
+      <div class="modal-actions">
+        <button id="modal-aceptar" class="btn btn-primary">Aceptar</button>
+        <button id="modal-vaciar" class="btn btn-secondary">Vaciar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuración de usuario -->
+  <div id="config-usuario" class="config-panel">
+    <input 
+      type="text" 
+      id="usuario-input" 
+      placeholder="Nombre y apellido del operario"
+      value="desconocido"
+    >
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/@zxing/library@0.21.3"></script>
+  <script type="module" src="./src/js/app.js"></script>
+</body>
+</html>

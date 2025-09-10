@@ -1,0 +1,337 @@
+/* Variables CSS con paleta del PRD */
+:root {
+  --color-old-rose: #a87772ff;
+  --color-engineering-orange: #bd2813ff;
+  --color-chili-red: #e4320bff;
+  --color-white: #ffffff;
+  --color-gray-light: #f4f4f4;
+  --color-gray-medium: #cccccc;
+  --color-gray-dark: #333333;
+  --color-success: #2b8a3e;
+  --color-error: #e03131;
+}
+
+/* Reset y base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--color-gray-light);
+  color: var(--color-gray-dark);
+  padding: 1rem;
+  line-height: 1.4;
+}
+
+/* Header */
+header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-engineering-orange);
+}
+
+header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+header p {
+  margin: 0;
+  color: var(--color-gray-dark);
+  font-size: 0.9rem;
+}
+
+/* Scanner */
+#scanner-section {
+  margin-bottom: 2rem;
+}
+
+#scanner-container {
+  width: 100%;
+  max-width: 640px;
+  height: 300px;
+  margin: 0 auto;
+  border: 3px solid var(--color-engineering-orange);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#scanner-status {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: var(--color-white);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  z-index: 10;
+}
+
+/* Lista de maletas */
+#lista-section h2 {
+  color: var(--color-engineering-orange);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.maletas-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.maleta-item {
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-medium);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.maleta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.maleta-codigo {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--color-engineering-orange);
+}
+
+.maleta-hora {
+  font-size: 0.8rem;
+  color: var(--color-gray-dark);
+}
+
+.categorias-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Botones de categorías */
+.categoria-btn {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--color-old-rose);
+  border-radius: 6px;
+  background: var(--color-white);
+  color: var(--color-old-rose);
+  font-weight: bold;
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  min-width: 44px;
+  text-align: center;
+}
+
+.categoria-btn.active {
+  background: var(--color-chili-red);
+  border-color: var(--color-chili-red);
+  color: var(--color-white);
+}
+
+.categoria-btn.obs-btn {
+  border-color: var(--color-engineering-orange);
+  color: var(--color-engineering-orange);
+}
+
+.categoria-btn.obs-btn.active {
+  background: var(--color-engineering-orange);
+  border-color: var(--color-engineering-orange);
+  color: var(--color-white);
+}
+
+/* Botones principales */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.btn-primary {
+  background: var(--color-engineering-orange);
+  color: var(--color-white);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-chili-red);
+}
+
+.btn-primary:disabled {
+  background: var(--color-gray-medium);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--color-old-rose);
+  color: var(--color-white);
+}
+
+.btn-secondary:hover {
+  background: #8b5f5a;
+}
+
+#acciones {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal h3 {
+  margin: 0 0 1rem 0;
+  color: var(--color-engineering-orange);
+  font-size: 1.2rem;
+}
+
+.modal textarea {
+  width: 100%;
+  border: 2px solid var(--color-gray-medium);
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+.modal textarea:focus {
+  outline: none;
+  border-color: var(--color-engineering-orange);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.modal-actions .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* Configuración de usuario */
+.config-panel {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-medium);
+  border-radius: 6px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#usuario-input {
+  border: 1px solid var(--color-gray-medium);
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  width: 200px;
+}
+
+/* Estados de feedback */
+.flash-success {
+  animation: flashGreen 0.5s ease;
+}
+
+.flash-error {
+  animation: flashRed 0.5s ease;
+}
+
+@keyframes flashGreen {
+  0%, 100% { background: var(--color-white); }
+  50% { background: var(--color-success); }
+}
+
+@keyframes flashRed {
+  0%, 100% { background: var(--color-white); }
+  50% { background: var(--color-error); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  body {
+    padding: 0.5rem;
+  }
+  
+  .categorias-container {
+    gap: 0.25rem;
+  }
+  
+  .categoria-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    min-width: 40px;
+  }
+  
+  #acciones {
+    flex-direction: column;
+  }
+  
+  .config-panel {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin: 1rem 0;
+  }
+}

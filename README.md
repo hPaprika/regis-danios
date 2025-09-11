@@ -91,7 +91,7 @@ MIT
 
 ## 🧪 Pruebas
 
-- Usa [`test.html`](test.html) para pruebas manuales del endpoint de Apps Script.
+- Usa [`test.html`](public/test.html) para pruebas manuales del endpoint de Apps Script.
 
 ---
 

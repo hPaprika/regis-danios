@@ -1,397 +1,401 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tests</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Registro - Prototipo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
 
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 30px;
-      font-size: 24px;
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
 
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-      color: #555;
-    }
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
 
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e1e5e9;
-      border-radius: 10px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-    }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #667eea;
-    }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
 
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
 
-    .url-section {
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
 
-    .url-section label {
-      color: #666;
-      font-size: 14px;
-    }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
 
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
+        .url-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
 
-    button {
-      flex: 1;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+        .url-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
 
-    .btn-send {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    .btn-random {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-    }
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
 
-    .btn-clear {
-      background: #6c757d;
-      color: white;
-    }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
 
-    .status {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      font-weight: 500;
-      display: none;
-    }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
 
-    .status.success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
 
-    .status.error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
 
-    .status.loading {
-      background: #cce7ff;
-      color: #004085;
-      border: 1px solid #b3d7ff;
-    }
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
 
-    .response-details {
-      margin-top: 10px;
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 5px;
-      font-family: monospace;
-      font-size: 12px;
-      white-space: pre-wrap;
-    }
-  </style>
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+
+        .current-time {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>🧳 Prueba PWA Maletas</h1>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Sistema de Registro</h1>
+            <p>Prototipo para envío de datos a Google Apps Script</p>
+        </div>
 
-    <div class="url-section">
-      <label for="scriptUrl">URL de Google Apps Script:</label>
-      <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/YOUR_ID/exec" value="">
+        <div class="current-time" id="currentTime"></div>
+
+        <div class="url-section">
+            <h3>⚙️ Configuración</h3>
+            <div class="form-group">
+                <label for="gasUrl">URL del Script GAS:</label>
+                <input type="url" id="gasUrl" placeholder="https://script.google.com/macros/s/..." value="">
+            </div>
+        </div>
+
+        <form id="dataForm">
+            <div class="form-group">
+                <label for="codigo">🏷️ Código:</label>
+                <input type="text" id="codigo" name="codigo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="usuario">👤 Usuario:</label>
+                <input type="text" id="usuario" name="usuario" required>
+            </div>
+
+            <div class="form-group">
+                <label for="turno">🔄 Turno:</label>
+                <select id="turno" name="turno" required>
+                    <option value="">Seleccionar turno...</option>
+                    <option value="BRC-ERC">BRC-ERC</option>
+                    <option value="MAT-TAR">MAT-TAR</option>
+                    <option value="TAR-NOC">TAR-NOC</option>
+                    <option value="NOC-MAD">NOC-MAD</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="categorias">📝 Categorías:</label>
+                <select id="categorias" name="categorias" required>
+                    <option value="">Seleccionar categoría...</option>
+                    <option value="Roto">Roto</option>
+                    <option value="Manchado">Manchado</option>
+                    <option value="Desgastado">Desgastado</option>
+                    <option value="Defectuoso">Defectuoso</option>
+                    <option value="Incompleto">Incompleto</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="observaciones">💬 Observaciones:</label>
+                <textarea id="observaciones" name="observaciones" placeholder="Describe el problema o situación..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="btn btn-secondary" onclick="fillRandomData()">🎲 Datos Aleatorios</button>
+                <button type="button" class="btn btn-success" onclick="clearForm()">🗑️ Limpiar</button>
+                <button type="submit" class="btn btn-primary">📤 Enviar Datos</button>
+            </div>
+        </form>
+
+        <div id="status" class="status"></div>
     </div>
 
-    <form id="maletaForm">
-      <div class="form-group">
-        <label for="codigo">Código (6 dígitos):</label>
-        <input type="text" id="codigo" maxlength="6" pattern="[0-9]{6}" required>
-      </div>
+    <script>
+        // Actualizar hora actual
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            document.getElementById('currentTime').textContent = 
+                '🕒 Hora actual: ' + now.toLocaleDateString('es-ES', options).replace(',', ',');
+        }
 
-      <div class="form-group">
-        <label for="usuario">Usuario:</label>
-        <input type="text" id="usuario" required>
-      </div>
+        // Datos aleatorios para testing
+        const randomData = {
+            codigos: ['107186', '108234', '109567', '110892', '111423', '112654'],
+            usuarios: ['Carlos_López', 'Ana_García', 'Miguel_Rodríguez', 'Laura_Martín', 'Pedro_Sánchez', 'María_González'],
+            turnos: ['BRC-ERC', 'MAT-TAR', 'TAR-NOC', 'NOC-MAD'],
+            categorias: ['Roto', 'Manchado', 'Desgastado', 'Defectuoso', 'Incompleto'],
+            observaciones: [
+                'Manchas de grasa en la tela',
+                'Rasgadura en la parte inferior',
+                'Decoloración por lavado',
+                'Botones sueltos o faltantes',
+                'Costuras descosidas',
+                'Desgaste excesivo en codos',
+                'Manchas de pintura',
+                'Encogimiento después del lavado'
+            ]
+        };
 
-      <div class="form-group">
-        <label for="turno">Turno:</label>
-        <select id="turno" required>
-          <option value="">Seleccionar turno</option>
-          <option value="BRC-ERC">BRC-ERC</option>
-          <option value="IRC-KRC">IRC-KRC</option>
-        </select>
-      </div>
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
 
-      <div class="form-group">
-        <label for="categorias">Categorías:</label>
-        <select id="categorias">
-          <option value="">Sin categoría</option>
-          <option value="Dañado">Dañado</option>
-          <option value="Rayado">Rayado</option>
-          <option value="Roto">Roto</option>
-          <option value="Sucio">Sucio</option>
-          <option value="Desgastado">Desgastado</option>
-        </select>
-      </div>
+        function fillRandomData() {
+            document.getElementById('codigo').value = getRandom(randomData.codigos);
+            document.getElementById('usuario').value = getRandom(randomData.usuarios);
+            document.getElementById('turno').value = getRandom(randomData.turnos);
+            document.getElementById('categorias').value = getRandom(randomData.categorias);
+            document.getElementById('observaciones').value = getRandom(randomData.observaciones);
+        }
 
-      <div class="form-group">
-        <label for="observaciones">Observaciones:</label>
-        <textarea id="observaciones" placeholder="Descripción del daño..."></textarea>
-      </div>
+        function clearForm() {
+            document.getElementById('dataForm').reset();
+            showStatus('Formulario limpiado', 'success');
+        }
 
-      <div class="buttons">
-        <button type="button" class="btn-random" onclick="generarDatosPrueba()">
-          🎲 Datos Random
-        </button>
-        <button type="button" class="btn-clear" onclick="limpiarFormulario()">
-          🗑️ Limpiar
-        </button>
-        <button type="submit" class="btn-send">
-          📤 Enviar
-        </button>
-      </div>
-    </form>
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Scroll hacia el mensaje de estado
+            statusDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 10000); // 10 segundos para leer el mensaje completo
+            }
+        }
 
-    <div id="status" class="status"></div>
-  </div>
+        function getCurrentDateTime() {
+            const now = new Date();
+            const options = {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            return now.toLocaleDateString('es-ES', options).replace(',', ',');
+        }
 
-  <script>
-    // Configuración
-    const form = document.getElementById('maletaForm');
-    const statusDiv = document.getElementById('status');
+        // Manejar envío del formulario
+        document.getElementById('dataForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const gasUrl = document.getElementById('gasUrl').value.trim();
+            if (!gasUrl) {
+                showStatus('❌ Por favor, ingresa la URL del script GAS', 'error');
+                return;
+            }
 
-    // Datos de ejemplo para generar aleatorios
-    const usuarios = ['Juan_Pérez', 'María_García', 'Carlos_López', 'Ana_Martín', 'Luis_Sánchez'];
-    const categoriasDaño = ['Dañado', 'Rayado', 'Roto', 'Sucio', 'Desgastado'];
-    const observaciones = [
-      'Maleta con rayones en la superficie',
-      'Rueda derecha no gira correctamente',
-      'Cremallera principal atascada',
-      'Manija rota en la parte superior',
-      'Esquina inferior dañada por impacto',
-      'Manchas de grasa en la tela',
-      'Desgaste excesivo en la base',
-      'Cierre de seguridad no funciona'
-    ];
+            showStatus('📤 Enviando datos...', 'loading');
 
-    // Generar datos de prueba aleatorios
-    function generarDatosPrueba() {
-      document.getElementById('codigo').value = Math.floor(Math.random() * 900000) + 100000;
-      document.getElementById('usuario').value = usuarios[Math.floor(Math.random() * usuarios.length)];
-      document.getElementById('turno').value = Math.random() > 0.5 ? 'BRC-ERC' : 'IRC-KRC';
-      document.getElementById('categorias').value = categoriasDaño[Math.floor(Math.random() * categoriasDaño.length)];
-      document.getElementById('observaciones').value = observaciones[Math.floor(Math.random() * observaciones.length)];
+            const formData = {
+                codigo: document.getElementById('codigo').value,
+                usuario: document.getElementById('usuario').value,
+                turno: document.getElementById('turno').value,
+                categorias: document.getElementById('categorias').value,
+                observaciones: document.getElementById('observaciones').value,
+                fechaHora: getCurrentDateTime()
+            };
 
-      mostrarStatus('🎲 Datos generados aleatoriamente', 'success');
-    }
+            try {
+                const response = await fetch(gasUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-    // Limpiar formulario
-    function limpiarFormulario() {
-      form.reset();
-      ocultarStatus();
-    }
-
-    // Mostrar status
-    function mostrarStatus(mensaje, tipo, detalles = null) {
-      statusDiv.className = `status ${tipo}`;
-      statusDiv.innerHTML = mensaje;
-
-      if (detalles) {
-        statusDiv.innerHTML += `<div class="response-details">${detalles}</div>`;
-      }
-
-      statusDiv.style.display = 'block';
-    }
-
-    // Ocultar status
-    function ocultarStatus() {
-      statusDiv.style.display = 'none';
-    }
-
-    // Manejar envío del formulario
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const scriptUrl = document.getElementById('scriptUrl').value.trim();
-
-      if (!scriptUrl) {
-        mostrarStatus('❌ Por favor, ingresa la URL de Google Apps Script', 'error');
-        return;
-      }
-
-      // Recopilar datos del formulario
-      const formData = {
-        codigo: document.getElementById('codigo').value.trim(),
-        usuario: document.getElementById('usuario').value.trim(),
-        turno: document.getElementById('turno').value,
-        categorias: document.getElementById('categorias').value,
-        observaciones: document.getElementById('observaciones').value.trim(),
-        fechaHora: new Date().toLocaleString('es-PE', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        })
-      };
-
-      // Mostrar loading
-      mostrarStatus('⏳ Enviando datos...', 'loading');
-
-      try {
-        console.log('📤 Enviando datos:', formData);
-        console.log('🌐 URL:', scriptUrl);
-
-        const startTime = Date.now();
-
-        const response = await fetch(scriptUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData)
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showStatus('✅ Datos enviados correctamente', 'success');
+                    document.getElementById('dataForm').reset();
+                } else {
+                    showStatus('❌ Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Error de conexión: ' + error.message, 'error');
+                console.error('Error:', error);
+            }
         });
 
-        const responseTime = Date.now() - startTime;
-        console.log('📥 Respuesta HTTP status:', response.status);
+        // Inicializar
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
 
-        const result = await response.json();
-        console.log('📥 Respuesta JSON:', result);
-
-        if (result.success) {
-          const mensaje = `✅ ${result.message}`;
-          const detalles = `Tiempo: ${responseTime}ms\nTimestamp: ${result.timestamp}\nStatus: ${response.status}`;
-          mostrarStatus(mensaje, 'success', detalles);
-
-          // Limpiar formulario después de éxito
-          setTimeout(() => {
-            limpiarFormulario();
-          }, 3000);
-        } else {
-          const mensaje = `❌ Error: ${result.message}`;
-          const detalles = `Código: ${result.code || 'N/A'}\nTimestamp: ${result.timestamp}`;
-          mostrarStatus(mensaje, 'error', detalles);
-        }
-
-      } catch (error) {
-        console.error('❌ Error completo:', error);
-
-        let mensaje = '❌ Error de conexión';
-        let detalles = `Error: ${error.message}`;
-
-        // Detectar tipos específicos de error
-        if (error.message.includes('CORS')) {
-          mensaje = '❌ Error CORS - Apps Script mal configurado';
-          detalles = `PROBLEMA: Apps Script no permite el acceso desde navegadores
-                    
-            SOLUCIÓN:
-            1. En Apps Script: Desplegar → Nueva implementación
-            2. Tipo: "Aplicación web"
-            3. Ejecutar como: "Yo"
-            4. Acceso: "Cualquier usuario" ⚠️
-            5. Usar URL que termine en /exec
-
-            Tu URL actual: ${scriptUrl}`;
-        } else if (error.message.includes('URL incorrecta')) {
-          mensaje = '❌ URL incorrecta';
-          detalles = `La URL debe terminar en /exec, no /edit
-                              
-          Ejemplo correcto:
-          https://script.google.com/macros/s/TU_ID/exec
-
-          Tu URL actual: ${scriptUrl}`;
-        } else if (error.message.includes('Failed to fetch')) {
-          mensaje = '❌ No se puede conectar al servidor';
-          detalles = `Posibles causas:
-          • Apps Script no desplegado como Web App
-          • URL incorrecta o inválida
-          • Sin conexión a internet
-          • Bloqueo por firewall/antivirus
-
-          URL probada: ${scriptUrl}`;
-        }
-
-        mostrarStatus(mensaje, 'error', detalles);
-      }
-    });
-
-    // Validación en tiempo real del código
-    document.getElementById('codigo').addEventListener('input', (e) => {
-      const value = e.target.value;
-      if (value && !/^\d+$/.test(value)) {
-        e.target.value = value.replace(/\D/g, '');
-      }
-    });
-
-    // Auto-focus en URL al cargar
-    window.addEventListener('load', () => {
-      document.getElementById('scriptUrl').focus();
-    });
-  </script>
+        // Llenar con datos de ejemplo al cargar
+        setTimeout(() => {
+            fillRandomData();
+        }, 500);
+    </script>
 </body>
-
 </html>

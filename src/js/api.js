@@ -5,7 +5,7 @@
 class API {
   constructor() {
     // URL del endpoint de Google Apps Script - debe ser configurada
-    this.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztQIdBekeVnEtpgBZYRLChmY1s2Ay4iY4jHr0CSFNTf3jMMJaJzEzqdgCrePmzsm2rhw/exec';
+    this.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3q_TLfSMWDylaAGbGmqU0L-B4k28Z4NVdQ3AIFddiqvc_9WRjdTkrnhhONw109ulu0Q/exec';
     this.TIMEOUT = 15000; // 15 segundos
   }
 
@@ -31,25 +31,24 @@ class API {
       throw new Error('URL del Apps Script no configurada correctamente');
     }
 
-    const payload = {
-      action: 'addRecords',
-      records: records,
-      timestamp: new Date().toISOString(),
-      source: 'regis-daños'
-    };
+
+    // Usar FormData en vez de JSON
+    const formData = new FormData();
+    formData.append('action', 'addRecords');
+    formData.append('records', JSON.stringify(records));
+    formData.append('timestamp', new Date().toISOString());
+    formData.append('source', 'regis-daños');
 
     try {
-      console.log('Enviando registros:', payload);
+      console.log('Enviando registros (FormData):', formData);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT);
 
       const response = await fetch(this.APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        // No headers, para evitar CORS con FormData
+        body: formData,
         signal: controller.signal
       });
 
@@ -59,9 +58,16 @@ class API {
         throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
       }
 
-      const result = await response.json();
-      
-      if (result.error) {
+      // Apps Script puede responder con JSON o texto
+      let result;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        result = await response.text();
+      }
+
+      if (result && result.error) {
         throw new Error(result.error);
       }
 
@@ -70,15 +76,13 @@ class API {
 
     } catch (error) {
       console.error('Error enviando registros:', error);
-      
       if (error.name === 'AbortError') {
         throw new Error('Timeout: El envío tardó más de lo esperado');
       }
-      
       if (!navigator.onLine) {
         throw new Error('Sin conexión a internet');
       }
-      
+
       throw error;
     }
   }
@@ -94,12 +98,12 @@ class API {
     }
 
     return records.every(record => {
-      return record.codigo && 
-             record.fechaHora && 
-             record.usuario && 
-             record.turno &&
-             typeof record.categorias === 'string' &&
-             typeof record.observacion === 'string';
+      return record.codigo &&
+        record.fechaHora &&
+        record.usuario &&
+        record.turno &&
+        typeof record.categorias === 'string' &&
+        typeof record.observacion === 'string';
     });
   }
 
@@ -108,10 +112,10 @@ class API {
    * @returns {Promise} - Promesa con resultado de la prueba
    */
   async testConnection() {
-    const testPayload = {
-      action: 'ping',
-      timestamp: new Date().toISOString()
-    };
+    // Usar FormData para test de conexión
+    const formData = new FormData();
+    formData.append('action', 'ping');
+    formData.append('timestamp', new Date().toISOString());
 
     try {
       const controller = new AbortController();
@@ -119,17 +123,20 @@ class API {
 
       const response = await fetch(this.APPS_SCRIPT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(testPayload),
+        body: formData,
         signal: controller.signal
       });
 
       clearTimeout(timeoutId);
-      
+
       if (response.ok) {
-        const result = await response.json();
+        let result;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          result = await response.json();
+        } else {
+          result = await response.text();
+        }
         return { success: true, data: result };
       } else {
         return { success: false, error: `HTTP ${response.status}` };
@@ -152,11 +159,11 @@ class API {
     }
 
     let lastError;
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const result = await this.sendRecords(records);
-        
+
         // Si llegamos aquí, el envío fue exitoso
         return {
           success: true,
@@ -168,7 +175,7 @@ class API {
       } catch (error) {
         lastError = error;
         console.warn(`Intento ${attempt}/${maxRetries} falló:`, error.message);
-        
+
         // Si no es el último intento, esperar antes de reintentar
         if (attempt < maxRetries) {
           await this.wait(1000 * attempt); // Backoff progresivo
@@ -198,8 +205,8 @@ class API {
       online: navigator.onLine,
       endpoint: this.APPS_SCRIPT_URL,
       timeout: this.TIMEOUT,
-      configured: this.APPS_SCRIPT_URL.includes('script.google.com') && 
-                  !this.APPS_SCRIPT_URL.includes('YOUR_SCRIPT_ID')
+      configured: this.APPS_SCRIPT_URL.includes('script.google.com') &&
+        !this.APPS_SCRIPT_URL.includes('YOUR_SCRIPT_ID')
     };
   }
 }

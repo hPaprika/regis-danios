@@ -106,7 +106,7 @@ class MaletasApp {
     // o archivo de configuración
     const apiUrl = process.env.APPS_SCRIPT_URL || 
                    localStorage.getItem('appsScriptUrl') ||
-                   'https://script.google.com/macros/s/AKfycbztQIdBekeVnEtpgBZYRLChmY1s2Ay4iY4jHr0CSFNTf3jMMJaJzEzqdgCrePmzsm2rhw/exec';
+                   'https://script.google.com/macros/s/AKfycbw3q_TLfSMWDylaAGbGmqU0L-B4k28Z4NVdQ3AIFddiqvc_9WRjdTkrnhhONw109ulu0Q/exec';
     
     this.api.setEndpoint(apiUrl);
     

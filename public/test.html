@@ -366,12 +366,18 @@
             };
 
             try {
+                // Crear FormData en lugar de JSON para evitar preflight CORS
+                const form = new FormData();
+                form.append('codigo', formData.codigo);
+                form.append('usuario', formData.usuario);
+                form.append('turno', formData.turno);
+                form.append('categorias', formData.categorias);
+                form.append('observaciones', formData.observaciones);
+                form.append('fechaHora', formData.fechaHora);
+
                 const response = await fetch(gasUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
+                    body: form  // Sin headers Content-Type, el navegador lo maneja automáticamente
                 });
 
                 const result = await response.json();

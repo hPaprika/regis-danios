@@ -1,191 +1,102 @@
+
+import { addRecord, hasRecord } from './store.js';
+import { showScanFeedback, showMessage } from './ui.js';
+
+// Logica del Scanner
+const SCAN_DELAY_MS = 1000;
+let isScanning = false;
+let lastScanTime = 0;
+
 /**
- * scanner.js - Manejo de escaneo de códigos con ZXing
+ * Inicializa y comienza el escáner de códigos ZXing.
+ * @param {HTMLVideoElement} videoEl - El elemento de video que se utilizará para el escáner.
+ * @param {HTMLElement} scannerStatusEl - El elemento para mostrar el estado del escáner.
  */
-
-class Scanner {
-  constructor() {
-    this.codeReader = null;
-    this.isScanning = false;
-    this.scanDelay = 1000; // 1 segundo de delay
-    this.lastScanTime = 0;
-    this.onCodeScanned = null; // Callback para códigos escaneados
-  }
-
-  /**
-   * Inicia el escáner con la cámara trasera
-   * @param {HTMLVideoElement} videoElement - Elemento video donde mostrar la cámara
-   * @param {Function} onSuccess - Callback para códigos válidos (nuevos)
-   * @param {Function} onDuplicate - Callback para códigos duplicados
-   * @param {Function} onError - Callback para errores
-   */
-  async startScanner(videoElement, onSuccess, onDuplicate, onError) {
+export async function startScanner(videoEl, scannerStatusEl) {
     try {
-      // Solicitar acceso a cámara trasera
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          facingMode: 'environment', // Cámara trasera
-          width: { ideal: 640 }, 
-          height: { ideal: 480 } 
-        }
-      });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } } });
+        videoEl.srcObject = stream;
+        scannerStatusEl.textContent = `\u{1F4F7}`;
 
-      videoElement.srcObject = stream;
-      this.updateScannerStatus('Cámara activada - Apunta al código');
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+        isScanning = true;
 
-      // Inicializar ZXing reader
-      this.codeReader = new ZXing.BrowserMultiFormatReader();
-      this.isScanning = true;
-
-      // Comenzar decodificación continua
-      this.codeReader.decodeFromVideoDevice(null, videoElement, (result, error) => {
-        if (result && this.isScanning) {
-          this.handleScanResult(result.text, onSuccess, onDuplicate, onError);
-        }
-        
-        if (error && !(error instanceof ZXing.NotFoundException)) {
-          console.warn('Scanner error:', error);
-        }
-      });
-
+        codeReader.decodeFromVideoDevice(null, videoEl, (result, error) => {
+            if (result && isScanning) {
+                handleScannedCode(result.text);
+            }
+            if (error && !(error instanceof ZXing.NotFoundException)) {
+                console.warn('Scanner error:', error);
+            }
+        });
     } catch (err) {
-      console.error('Error al iniciar escáner:', err);
-      this.updateScannerStatus('Error: No se pudo acceder a la cámara');
-      if (onError) onError(err);
+        scannerStatusEl.textContent = 'Error: No se pudo acceder a la cámara';
+        console.error('Error starting scanner:', err);
     }
-  }
-
-  /**
-   * Procesa el resultado del escaneo
-   * @param {string} rawCode - Código escaneado completo
-   * @param {Function} onSuccess - Callback para códigos nuevos
-   * @param {Function} onDuplicate - Callback para códigos duplicados
-   * @param {Function} onError - Callback para errores
-   */
-  handleScanResult(rawCode, onSuccess, onDuplicate, onError) {
-    const now = Date.now();
-    
-    // Aplicar delay para evitar múltiples lecturas
-    if (now - this.lastScanTime < this.scanDelay) {
-      return;
-    }
-
-    // Extraer últimos 6 dígitos
-    const codigo = this.extractLastSixDigits(rawCode);
-    
-    if (!codigo) {
-      this.playBeep('error');
-      this.updateScannerStatus('Código no válido - Intenta de nuevo');
-      if (onError) onError('Código no contiene suficientes dígitos');
-      return;
-    }
-
-    this.lastScanTime = now;
-    
-    // Verificar si es duplicado (esto se hace en storage.js)
-    // Aquí solo pasamos el código al callback
-    if (onSuccess) {
-      onSuccess(codigo);
-    }
-  }
-
-  /**
-   * Extrae los últimos 6 dígitos de un código
-   * @param {string} code - Código completo escaneado
-   * @returns {string|null} - Últimos 6 dígitos o null si no es válido
-   */
-  extractLastSixDigits(code) {
-    // Limpiar código (solo números)
-    const digits = code.replace(/\D/g, '');
-    
-    if (digits.length < 6) {
-      return null;
-    }
-    
-    return digits.slice(-6); // Últimos 6 dígitos
-  }
-
-  /**
-   * Reproduce beep de confirmación o error
-   * @param {string} type - 'success' o 'error'
-   */
-  playBeep(type = 'success') {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      if (type === 'success') {
-        // Beep agudo para éxito
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      } else {
-        // Beep grave para error
-        oscillator.type = 'square';
-        oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
-        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-      }
-
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.2);
-      
-    } catch (err) {
-      console.warn('No se pudo reproducir sonido:', err);
-    }
-  }
-
-  /**
-   * Actualiza el estado mostrado en el escáner
-   * @param {string} message - Mensaje de estado
-   */
-  updateScannerStatus(message) {
-    const statusEl = document.getElementById('scanner-status');
-    if (statusEl) {
-      statusEl.textContent = message;
-      
-      // Ocultar después de 3 segundos si no es un error
-      if (!message.includes('Error') && !message.includes('Iniciando')) {
-        setTimeout(() => {
-          if (statusEl.textContent === message) {
-            statusEl.textContent = '';
-          }
-        }, 3000);
-      }
-    }
-  }
-
-  /**
-   * Detiene el escáner y libera recursos
-   */
-  stopScanner() {
-    this.isScanning = false;
-    
-    if (this.codeReader) {
-      this.codeReader.reset();
-      this.codeReader = null;
-    }
-    
-    const video = document.getElementById('video');
-    if (video && video.srcObject) {
-      const tracks = video.srcObject.getTracks();
-      tracks.forEach(track => track.stop());
-      video.srcObject = null;
-    }
-    
-    this.updateScannerStatus('Escáner detenido');
-  }
-
-  /**
-   * Reinicia el escáner
-   */
-  async restartScanner(videoElement, onSuccess, onDuplicate, onError) {
-    this.stopScanner();
-    await new Promise(resolve => setTimeout(resolve, 500)); // Pequeña pausa
-    await this.startScanner(videoElement, onSuccess, onDuplicate, onError);
-  }
 }
 
-export default Scanner;
+/**
+ * Maneja un código escaneado, lo procesa y proporciona retroalimentación.
+ * @param {string} rawCode - El código sin procesar del escáner.
+ */
+function handleScannedCode(rawCode) {
+    const now = Date.now();
+    if (now - lastScanTime < SCAN_DELAY_MS) return;
+
+    const code = rawCode.replace(/\D/g, '').slice(-6);
+    if (code.length < 6) {
+        playBeep('error');
+        showMessage('Código no válido', 'error');
+        return;
+    }
+
+    lastScanTime = now;
+
+    if (hasRecord(code)) {
+        playBeep('error');
+        showScanFeedback('error', `${code} \u{274E}`);
+    } else {
+        addRecord(code, getCurrentUser());
+        playBeep('success');
+        showScanFeedback('success', `${code} \u{2705}`);
+        renderLuggageList();
+    }
+}
+
+/**
+ * Reproduce un sonido de beep para retroalimentación de éxito o error.
+ * @param {'success' | 'error'} type - El tipo de sonido a reproducir.
+ */
+function playBeep(type = 'success') {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        if (type === 'success') {
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        } else {
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        }
+
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.2);
+    } catch (err) {
+        console.warn('No se puede reproducir Beep:', err);
+    }
+}
+
+/**
+ * Obtiene el nombre del usuario actual del almacenamiento local o de un aviso.
+ * @returns {string} El nombre del usuario actual.
+ */
+function getCurrentUser() {
+    let user = localStorage.getItem('regis-danos-user');
+    return user || 'desconocido';
+}

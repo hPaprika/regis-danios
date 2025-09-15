@@ -5,65 +5,82 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Escáner de Maletas Dañadas</title>
-  <link rel="stylesheet" href="src/css/styles.css">
-</head>
+  <!DOCTYPE html>
+  <html lang="es">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegisDaños</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+    <link rel="manifest" href="/manifest.json">
+  </head>
 
 <body>
   <header>
     <h1>RegisDaños</h1>
-    <p>Registrar maletas dañadas</p>
+    <p>Apunta la camara al codigo de barras de la maleta</p>
   </header>
 
-  <!-- Contenedor del escáner -->
-  <section id="scanner-section">
-    <div id="scanner-container">
-      <video id="video" autoplay playsinline></video>
-      <div id="scanner-status">Iniciando cámara...</div>
-    </div>
-  </section>
+  <main>
+    <section id="scanner-section">
+      <div id="scanner-container">
+        <video id="video" autoplay playsinline></video>
+        <div id="scanner-status">Initializing camera...</div>
+      </div>
+    </section>
 
-  <!-- Lista de maletas escaneadas -->
-  <section id="list-section">
-    <div class="maletas-cabecera">
-      <h2>Maletas Escaneadas</h2>
-      <div id="maletas-encabezado"></div>
-    </div>
-    <ul id="lista-maletas" class="maletas-lista"></ul>
+    <section id="list-section">
+      <div class="luggage-header-container">
+        <h2>Scanned Luggage</h2>
+        <div id="luggage-header">
+          <span id="user-span" class="user-interactive" title="Editar encargado">
+            Encargado: <span id="user-name"></span> <span style="font-size:1.2em;vertical-align:middle">&#128100;</span>
+          </span>
+          <div class="shift-date-row">
+            <span id="shift" class="shift-label">Turno:</span>
+            <span id="date" class="date-label">Fecha:</span>
+          </div>
+        </div>
+      </div>
+      <ul id="luggage-list" class="luggage-list"></ul>
+    </section>
 
-    <!-- Botones de acción -->
-    <div id="acciones">
-      <button id="btn-enviar" class="btn btn-primary" disabled>Enviar Registros</button>
-      <button id="btn-vaciar" class="btn btn-secondary">Vaciar Lista</button>
-    </div>
-  </section>
+  </main>
 
-  <!-- Modal para observaciones -->
+  <footer>
+    <div id="actions">
+      <button id="send-button" class="button primary-button" disabled>Send Records</button>
+      <button id="clear-button" class="button secondary-button">Clear List</button>
+    </div>
+  </footer>
+
   <div class="modal-overlay" id="modal-overlay">
-    <div class="modal" id="modal-observaciones">
-      <h3>Observaciones</h3>
-      <textarea id="observaciones-textarea" placeholder="Describe detalles específicos del daño..." rows="4"></textarea>
+    <div class="modal" id="observation-modal">
+      <h3>Observations</h3>
+      <textarea id="observation-textarea" placeholder="Describe specific details of the damage..." rows="4"></textarea>
       <div class="modal-actions">
-        <button id="modal-aceptar" class="btn btn-primary">Aceptar</button>
+        <button id="modal-accept-button" class="button primary-button">Accept</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal para editar encargado -->
-  <div id="config-usuario" class="config-panel" style="display:none;">
-    <div class="modal" id="modal-encargado">
-      <h3>Editar Encargado</h3>
-      <input type="text" id="usuario-input" placeholder="Nombre y apellido del operario" value="desconocido"
-        autocomplete="off">
+  <!-- Modal para nombre de operario -->
+  <div class="modal-overlay" id="user-modal-overlay" style="display:none;">
+    <div class="modal" id="user-modal">
+      <h3>Nombre de Operario</h3>
+      <input id="user-input" type="text" placeholder="Ingresa tu nombre..." autocomplete="off" />
       <div class="modal-actions">
-        <button id="modal-encargado-aceptar" class="btn btn-primary">Aceptar</button>
-        <button id="modal-encargado-cancelar" class="btn btn-secondary">Cancelar</button>
+        <button id="user-accept-button" class="button primary-button">Aceptar</button>
       </div>
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://unpkg.com/@zxing/library@0.21.3"></script>
   <script type="module" src="src/js/app.js"></script>
+</body>
+
+</html>
 </body>
 
 </html>

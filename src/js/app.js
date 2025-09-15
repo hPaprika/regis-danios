@@ -38,10 +38,7 @@ class MaletasApp {
       await this.initializeScanner();
 
       // Renderizar UI inicial
-      // this.ui.renderMaletasList();
-
-      // Insertar registros simulados para pruebas
-      this.ui.insertFakeRecords();
+      this.ui.renderMaletasList();
 
       // Configurar endpoint de API (en producción debe venir de config)
       this.configureAPI();

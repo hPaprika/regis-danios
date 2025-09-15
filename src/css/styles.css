@@ -23,13 +23,20 @@ body {
   color: var(--color-gray-dark);
   padding: 1rem;
   line-height: 1.4;
+  padding: 0;
 }
 
 /* Header */
 header {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: var(--color-engineering-orange);
+  color: gray-800;
+  background-color: var(--color-engineering-orange);
+  position: fixed;
+  top: 0;
+  z-index: 20;
+  width: 100%;
+  padding: 1rem;
 }
 
 header h1 {
@@ -46,6 +53,124 @@ header p {
 /* Scanner */
 #scanner-section {
   margin-bottom: 2rem;
+}
+
+/* Cabecera unificada de maletas escaneadas */
+.maletas-cabecera {
+  background: var(--color-white);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.2rem 1rem 1.2rem 1rem;
+  margin: 0 auto 1rem;
+  /* max-width: 95vw;
+  width: min(420px, 100%); */
+  width: clamp(420px, 90%, 600px);
+  background-color: var(--color-engineering-orange);
+}
+
+.maletas-cabecera h2 {
+  font-size: 1.3rem;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.maletas-cabecera .encabezado-datos-modal {
+  margin: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  width: 100%;
+  background: none;
+}
+
+.maletas-cabecera .encargado-row {
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.maletas-cabecera .turno-fecha-row {
+  /* gap: 3rem; */ 
+  font-size: 1rem;
+  color: var(--color-gray-dark);
+  text-align: center;
+}
+
+/* Fila de categorías y tacho */
+.maleta-row-flex {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-eliminar-maleta {
+  font-size: 1.3em;
+  padding: 0.2em 0.5em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e03131;
+  align-self: center;
+  transition: color 0.2s, background 0.2s;
+  border-radius: 50%;
+}
+
+.btn-eliminar-maleta:hover {
+  background: #ffeaea;
+  color: #a80000;
+}
+
+.encabezado-datos-modal {
+  margin: 1.2rem 0 1.5rem 0;
+  background: var(--color-white);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.2rem 1rem 1.2rem 1rem;
+  width: min(400px, 90%);
+  margin-inline: auto;
+}
+
+/* .encargado-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.7rem;
+} */
+
+.turno-fecha-row {
+  font-size: 0.98rem;
+  color: var(--color-gray-dark);
+  display: flex;
+  gap: 5px;
+  justify-content: space-between;
+}
+
+.encargado-interactivo {
+  cursor: pointer;
+  font-weight: bold;
+  background: rgba(255, 152, 0, 0.08);
+  border-radius: 8px;
+  padding: 0.3em 0.7em;
+  transition: background 0.2s;
+}
+
+.encargado-interactivo:hover,
+.destacado-encargado {
+  background: var(--color-engineering-orange);
+  color: var(--color-white);
+}
+
+.encargado-interactivo.solo-icono {
+  padding: 0.1em 0.3em;
+  background: none;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #scanner-container {
@@ -83,11 +208,19 @@ video {
 }
 
 /* Lista de maletas */
-#lista-section h2 {
-  color: var(--color-engineering-orange);
+#list-section h2 {
+    color: gray-800;
   font-size: 1.2rem;
   margin-bottom: 1rem;
   text-align: center;
+}
+
+/* lista vacia */
+.empty-message {
+  text-align: center;
+  color: var(--color-gray-dark);
+  font-style: italic;
+  margin-bottom: 1.5rem;
 }
 
 .maletas-lista {
@@ -201,11 +334,12 @@ video {
 }
 
 #acciones {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   display: flex;
-  gap: 1rem;
+  gap: 5rem;
   justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 2rem;
 }
 
 /* Modal */
@@ -220,7 +354,7 @@ video {
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 100;
 }
 
 .modal-overlay.active {
@@ -299,13 +433,27 @@ video {
 }
 
 @keyframes flashGreen {
-  0%, 100% { background: var(--color-white); }
-  50% { background: var(--color-success); }
+
+  0%,
+  100% {
+    background: var(--color-white);
+  }
+
+  50% {
+    background: var(--color-success);
+  }
 }
 
 @keyframes flashRed {
-  0%, 100% { background: var(--color-white); }
-  50% { background: var(--color-error); }
+
+  0%,
+  100% {
+    background: var(--color-white);
+  }
+
+  50% {
+    background: var(--color-error);
+  }
 }
 
 /* Responsive */
@@ -313,21 +461,16 @@ video {
   body {
     padding: 0.5rem;
   }
-  
+
   .categorias-container {
     gap: 0.25rem;
   }
-  
+
   .categoria-btn {
     padding: 0.4rem 0.6rem;
     font-size: 0.8rem;
     min-width: 40px;
   }
-  
-  #acciones {
-    flex-direction: column;
-  }
-  
   .config-panel {
     position: relative;
     bottom: auto;

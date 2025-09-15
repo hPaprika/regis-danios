@@ -13,7 +13,7 @@ class MaletasApp {
     this.storage = new Storage();
     this.ui = new UI(this.storage);
     this.api = new API();
-    
+
     this.isInitialized = false;
     this.isSending = false;
   }
@@ -24,28 +24,31 @@ class MaletasApp {
   async init() {
     try {
       console.log('Inicializando Maletas PWA...');
-      
+
       // Configurar callbacks de UI
       this.ui.setCallbacks(
         this.onCategoryChange.bind(this),
         this.onObservationChange.bind(this)
       );
-      
+
       // Configurar event listeners
       this.setupEventListeners();
-      
+
       // Inicializar escáner
       await this.initializeScanner();
-      
+
       // Renderizar UI inicial
-      this.ui.renderMaletasList();
-      
+      // this.ui.renderMaletasList();
+
+      // Insertar registros simulados para pruebas
+      this.ui.insertFakeRecords();
+
       // Configurar endpoint de API (en producción debe venir de config)
       this.configureAPI();
-      
+
       this.isInitialized = true;
       console.log('Aplicación inicializada correctamente');
-      
+
     } catch (error) {
       console.error('Error inicializando aplicación:', error);
       this.ui.showMessage('Error al inicializar la aplicación', 'error');
@@ -89,7 +92,7 @@ class MaletasApp {
    */
   async initializeScanner() {
     const video = document.getElementById('video');
-    
+
     await this.scanner.startScanner(
       video,
       this.onCodeScanned.bind(this),      // Código válido (nuevo)
@@ -104,12 +107,12 @@ class MaletasApp {
   configureAPI() {
     // En producción, esta URL debería venir de una variable de entorno
     // o archivo de configuración
-    const apiUrl = process.env.APPS_SCRIPT_URL || 
-                   localStorage.getItem('appsScriptUrl') ||
-                   'https://script.google.com/macros/s/AKfycbw3q_TLfSMWDylaAGbGmqU0L-B4k28Z4NVdQ3AIFddiqvc_9WRjdTkrnhhONw109ulu0Q/exec';
-    
+    const apiUrl = process.env.APPS_SCRIPT_URL ||
+      localStorage.getItem('appsScriptUrl') ||
+      'https://script.google.com/macros/s/AKfycbzTx3O2OGHhX9Z035zmNYWO2Yi4L4IoRWunQ22gJhuVDmo_Z-GyJaT4dWQRxpPmsiXlsA/exec';
+
     this.api.setEndpoint(apiUrl);
-    
+
     const connInfo = this.api.getConnectionInfo();
     if (!connInfo.configured) {
       console.warn('API endpoint no configurado. Los envíos fallarán.');
@@ -122,7 +125,7 @@ class MaletasApp {
    */
   onCodeScanned(codigo) {
     console.log('Código escaneado:', codigo);
-    
+
     // Verificar si ya existe
     if (this.storage.isScanned(codigo)) {
       this.onDuplicateCode(codigo);
@@ -132,15 +135,15 @@ class MaletasApp {
     // Agregar nuevo registro
     const usuario = this.ui.getCurrentUser();
     const record = this.storage.addRecord(codigo, usuario);
-    
+
     if (record) {
       // Feedback positivo
       this.scanner.playBeep('success');
       this.ui.showScanFeedback('success', `Maleta ${codigo} agregada`);
-      
+
       // Re-renderizar lista
       this.ui.renderMaletasList();
-      
+
       console.log('Registro agregado:', record);
     } else {
       this.onScanError('Error agregando registro');
@@ -153,7 +156,7 @@ class MaletasApp {
    */
   onDuplicateCode(codigo) {
     console.log('Código duplicado:', codigo);
-    
+
     // Feedback negativo
     this.scanner.playBeep('error');
     this.ui.showScanFeedback('error', `Maleta ${codigo} ya registrada`);
@@ -165,7 +168,7 @@ class MaletasApp {
    */
   onScanError(error) {
     console.error('Error en escaneo:', error);
-    
+
     this.scanner.playBeep('error');
     this.ui.showMessage(typeof error === 'string' ? error : error.message, 'error');
   }
@@ -201,7 +204,7 @@ class MaletasApp {
     }
 
     const records = this.storage.getFormattedRecords();
-    
+
     if (records.length === 0) {
       this.ui.showMessage('No hay registros para enviar', 'error');
       return;
@@ -210,33 +213,33 @@ class MaletasApp {
     this.isSending = true;
     const btnEnviar = document.getElementById('btn-enviar');
     const originalText = btnEnviar.textContent;
-    
+
     try {
       // Feedback visual
       btnEnviar.disabled = true;
       btnEnviar.textContent = 'Enviando...';
       this.ui.showMessage('Enviando registros al servidor...', 'info');
-      
+
       // Enviar con reintentos
       const result = await this.api.sendRecordsWithRetry(records);
-      
+
       if (result.success) {
         this.ui.showMessage(
-          `${result.recordsCount} registros enviados correctamente`, 
+          `${result.recordsCount} registros enviados correctamente`,
           'success'
         );
-        
+
         // Limpiar registros después de envío exitoso
         this.storage.clearRecords();
         this.ui.renderMaletasList();
-        
+
         console.log('Envío exitoso:', result);
       }
 
     } catch (error) {
       console.error('Error en envío:', error);
       this.ui.showMessage(
-        `Error enviando datos: ${error.message}`, 
+        `Error enviando datos: ${error.message}`,
         'error'
       );
 
@@ -253,7 +256,7 @@ class MaletasApp {
    */
   handleClearAll() {
     const stats = this.storage.getStats();
-    
+
     if (stats.total === 0) {
       this.ui.showMessage('No hay registros para vaciar', 'info');
       return;
@@ -291,9 +294,9 @@ class MaletasApp {
         this.onDuplicateCode.bind(this),
         this.onScanError.bind(this)
       );
-      
+
       this.ui.showMessage('Escáner reiniciado', 'success');
-      
+
     } catch (error) {
       console.error('Error reiniciando escáner:', error);
       this.ui.showMessage('Error reiniciando escáner', 'error');
@@ -313,12 +316,12 @@ class MaletasApp {
 document.addEventListener('DOMContentLoaded', async () => {
   const app = new MaletasApp();
   await app.init();
-  
+
   // Exponer app globalmente para debugging
   if (process.env.NODE_ENV === 'development') {
     window.maletasApp = app;
   }
-  
+
   // Manejar cierre de aplicación
   window.addEventListener('beforeunload', () => {
     app.destroy();

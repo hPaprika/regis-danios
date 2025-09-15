@@ -3,6 +3,28 @@
  */
 
 class UI {
+  /**
+   * Inserta registros simulados para pruebas
+   */
+  insertFakeRecords() {
+    const ejemplos = [
+      { codigo: '123456', usuario: 'prueba1', categorias: {A:true,B:false,C:false}, observacion: 'Asa rota', fecha: new Date().toISOString() },
+      { codigo: '234567', usuario: 'prueba2', categorias: {A:false,B:true,C:false}, observacion: '', fecha: new Date().toISOString() },
+      { codigo: '345678', usuario: 'prueba3', categorias: {A:false,B:false,C:true}, observacion: 'Rueda rota', fecha: new Date().toISOString() },
+      { codigo: '456789', usuario: 'prueba4', categorias: {A:true,B:true,C:false}, observacion: '', fecha: new Date().toISOString() },
+      { codigo: '567890', usuario: 'prueba5', categorias: {A:false,B:true,C:true}, observacion: 'Maleta y rueda rotas', fecha: new Date().toISOString() },
+    ];
+    ejemplos.forEach(ej => {
+      // Usar el método de storage para agregar registro
+      this.storage.addRecord(ej.codigo, ej.usuario);
+      // Actualizar categorías y observación si aplica
+      this.storage.updateCategories(ej.codigo, ej.categorias);
+      if (ej.observacion) {
+        this.storage.updateObservation(ej.codigo, ej.observacion);
+      }
+    });
+    this.renderMaletasList();
+  }
   constructor(storage) {
     this.storage = storage;
     this.currentModalCodigo = null;
@@ -128,18 +150,11 @@ class UI {
   initializeModal() {
     const modalOverlay = document.getElementById('modal-overlay');
     const modalAceptar = document.getElementById('modal-aceptar');
-    const modalVaciar = document.getElementById('modal-vaciar');
     const textarea = document.getElementById('observaciones-textarea');
 
     // Botón aceptar
     modalAceptar.addEventListener('click', () => {
       this.saveObservation();
-    });
-
-    // Botón vaciar
-    modalVaciar.addEventListener('click', () => {
-      textarea.value = '';
-      textarea.focus();
     });
 
     // Cerrar al hacer click fuera del modal

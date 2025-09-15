@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Escáner de Maletas Dañadas</title>
-  <link rel="stylesheet" href="./src/css/styles.css">
+  <link rel="stylesheet" href="src/css/styles.css">
 </head>
+
 <body>
   <header>
-    <h1>Escáner de Maletas Dañadas</h1>
-    <p>Apunta la cámara al código de barras de la maleta</p>
+    <h1>RegisDaños</h1>
+    <p>Registrar maletas dañadas</p>
   </header>
 
   <!-- Contenedor del escáner -->
@@ -21,14 +23,17 @@
   </section>
 
   <!-- Lista de maletas escaneadas -->
-  <section id="lista-section">
-    <h2>Maletas Escaneadas</h2>
+  <section id="list-section">
+    <div class="maletas-cabecera">
+      <h2>Maletas Escaneadas</h2>
+      <div id="maletas-encabezado"></div>
+    </div>
     <ul id="lista-maletas" class="maletas-lista"></ul>
-    
+
     <!-- Botones de acción -->
     <div id="acciones">
       <button id="btn-enviar" class="btn btn-primary" disabled>Enviar Registros</button>
-      <button id="btn-vaciar" class="btn btn-secondary">Vaciar Todo</button>
+      <button id="btn-vaciar" class="btn btn-secondary">Vaciar Lista</button>
     </div>
   </section>
 
@@ -36,30 +41,29 @@
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal" id="modal-observaciones">
       <h3>Observaciones</h3>
-      <textarea 
-        id="observaciones-textarea" 
-        placeholder="Describe detalles específicos del daño..."
-        rows="4"
-      ></textarea>
+      <textarea id="observaciones-textarea" placeholder="Describe detalles específicos del daño..." rows="4"></textarea>
       <div class="modal-actions">
         <button id="modal-aceptar" class="btn btn-primary">Aceptar</button>
-        <button id="modal-vaciar" class="btn btn-secondary">Vaciar</button>
       </div>
     </div>
   </div>
 
-  <!-- Configuración de usuario -->
-  <div id="config-usuario" class="config-panel">
-    <input 
-      type="text" 
-      id="usuario-input" 
-      placeholder="Nombre y apellido del operario"
-      value="desconocido"
-    >
+  <!-- Modal para editar encargado -->
+  <div id="config-usuario" class="config-panel" style="display:none;">
+    <div class="modal" id="modal-encargado">
+      <h3>Editar Encargado</h3>
+      <input type="text" id="usuario-input" placeholder="Nombre y apellido del operario" value="desconocido"
+        autocomplete="off">
+      <div class="modal-actions">
+        <button id="modal-encargado-aceptar" class="btn btn-primary">Aceptar</button>
+        <button id="modal-encargado-cancelar" class="btn btn-secondary">Cancelar</button>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts -->
   <script src="https://unpkg.com/@zxing/library@0.21.3"></script>
-  <script type="module" src="./src/js/app.js"></script>
+  <script type="module" src="src/js/app.js"></script>
 </body>
+
 </html>

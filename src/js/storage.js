@@ -43,7 +43,8 @@ class Storage {
   /**
    * Actualiza las categorías de daño de una maleta
    * @param {string} codigo - Código de 6 dígitos
-   * @param {Object} categorias - Objeto con categorías {A: true/false, B: true/false, C: true/false}
+   * @param {Object} categorias - Objeto con categorías 
+      {A: true/false, B: true/false, C: true/false}
    * @returns {boolean} - true si se actualizó correctamente
    */
   updateCategories(codigo, categorias) {
@@ -141,7 +142,7 @@ class Storage {
     
     // 04:00 a 12:59 → BRC-ERC
     // 13:00 a 23:59 → IRC-KRC
-    // 00:00 a 03:59 → IRC-KRC (considerado turno nocturno anterior)
+    // 00:00 a 03:59 → IRC-KRC (en discusión)
     
     if (hour >= 4 && hour <= 12) {
       return 'BRC-ERC';

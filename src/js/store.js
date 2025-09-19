@@ -95,6 +95,17 @@ export function hasRecord(code) {
 
 // Funciones de Utilidad
 /**
+ * Obtiene el turno y la fecha actual calculados automáticamente.
+ * @returns {{shift: string, date: string}}
+ */
+export function getCurrentShiftAndDate() {
+    const now = new Date();
+    return {
+        shift: calculateShift(now),
+        date: now.toLocaleDateString()
+    };
+}
+/**
  * Calcula el turno de trabajo basado en la hora actual.
  * @param {Date} date - El objeto de fecha.
  * @returns {string} El nombre del turno calculado.

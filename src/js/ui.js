@@ -1,14 +1,4 @@
-// Permitir cerrar la modal de usuario al hacer clic fuera
-const userModalOverlay = document.getElementById('user-modal-overlay');
-if (userModalOverlay) {
-    userModalOverlay.addEventListener('click', (e) => {
-        if (e.target === userModalOverlay) {
-            userModalOverlay.style.display = 'none';
-        }
-    });
-}
-
-import { getAllRecords, getRecordsCount, saveObservation as saveObservationToStore, getRecord } from './store.js';
+import { getAllRecords, getRecordsCount, saveObservation as saveObservationToStore, getRecord, getCurrentShiftAndDate } from './store.js';
 
 // Este sera inicializado por app.js
 let handleListClickCallback;
@@ -22,9 +12,11 @@ const modalOverlay = document.getElementById('modal-overlay');
 const modalAcceptButton = document.getElementById('modal-accept-button');
 const observationTextarea = document.getElementById('observation-textarea');
 const scannerStatusEl = document.getElementById('scanner-status');
-const userName = document.getElementById("user-name")
-const shift = document.getElementById("shift")
-const date = document.getElementById("date")
+const shiftSpan = document.getElementById('shift');
+const dateSpan = document.getElementById('date');
+// const userName = document.getElementById("user-name")
+// const shift = document.getElementById("shift")
+// const date = document.getElementById("date")
 let currentModalCode = null;
 
 export function initializeUI(listClickCallback) {
@@ -59,20 +51,37 @@ export function initializeUI(listClickCallback) {
     }
 }
 
+// Muestra el turno y la fecha actual en la interfaz.
+function showShiftAndDate() {
+    const { shift: currentShift, date: currentDate } = getCurrentShiftAndDate();
+    if (shiftSpan) shiftSpan.textContent = `Turno: ${currentShift}`;
+    if (dateSpan) dateSpan.textContent = `Fecha: ${currentDate}`;
+}
+showShiftAndDate();
+
+// Permitir cerrar la modal de usuario al hacer clic fuera
+const userModalOverlay = document.getElementById('user-modal-overlay');
+if (userModalOverlay) {
+    userModalOverlay.addEventListener('click', (e) => {
+        if (e.target === userModalOverlay) {
+            userModalOverlay.style.display = 'none';
+        }
+    });
+}
 /**
  * Renderiza la lista de equipajes en la interfaz de usuario.
  */
 export function renderLuggageList() {
     const records = getAllRecords();
-    const currentUser = getCurrentUser();
-    const shiftIn = records.length > 0 ? records[0].shift : '-';
-    const dateIn = records.length > 0 ? records[0].dateTime.split(' ')[0] : new Date().toLocaleDateString();
+    // const currentUser = getCurrentUser();
+    // const shiftIn = records.length > 0 ? records[0].shift : '-';
+    // const dateIn = records.length > 0 ? records[0].dateTime.split(' ')[0] : new Date().toLocaleDateString();
 
-    if (headerEl) {
-        userName.textContent = currentUser;
-        shift.textContent = `Turno: ${shiftIn}`;
-        date.textContent = `Fecha: ${dateIn}`;
-    }
+    // if (headerEl) {
+    //     userName.textContent = currentUser;
+    //     shift.textContent = `Turno: ${shiftIn}`;
+    //     date.textContent = `Fecha: ${dateIn}`;
+    // }
 
 
     if (records.length === 0) {

@@ -51,12 +51,12 @@ async function handleSendRecords() {
         showMessage(`Error enviando datos: ${error.message}`, 'error');
     } finally {
         sendButton.disabled = false;
-        renderLuggageList(); // Para actualizar el texto del botón
+        renderLuggageList();
     }
 }
 
 function handleClearAll() {
-    if (getRecordsCount() > 0 && confirm(`¿Estás seguro de vaciar ${getRecordsCount()} registros?`)) {
+    if (getRecordsCount() > 0) {
         clearAllRecords();
         renderLuggageList();
         showMessage('Lista vaciada', 'success');
@@ -74,9 +74,6 @@ function handleListClick(e) {
     } else if (target.matches('.obs-button')) {
         openObservationModal(code);
     } else if (target.matches('.delete-luggage-button')) {
-        if (confirm('¿Eliminar este registro?')) {
-            deleteRecord(code);
-            renderLuggageList();
-        }
+        renderLuggageList();
     }
 }

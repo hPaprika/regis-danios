@@ -1,0 +1,24 @@
+{
+  "name": "regis-danios",
+  "version": "1.0.0",
+  "description": "Aplicación web progresiva (PWA) para escanear, categorizar y registrar maletas dañadas en aeropuertos, con envío directo a Google Sheets mediante Google Apps Script. Optimizada para móviles y uso rápido por operarios.",
+  "main": "src/js/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hPaprika/regis-danios.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hPaprika/regis-danios/issues"
+  },
+  "homepage": "https://github.com/hPaprika/regis-danios#readme",
+  "dependencies": {
+    "html2canvas": "1.4.1",
+    "jsbarcode": "3.12.1"
+  }
+}

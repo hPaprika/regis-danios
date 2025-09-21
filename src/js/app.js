@@ -5,6 +5,16 @@ import { sendRecordsWithRetry } from './api.js';
 
 // inicialización de la Applicación
 document.addEventListener('DOMContentLoaded', () => {
+    // Eliminar registros si han expirado (a las 23:59 del mismo día)
+    try {
+        const stored = localStorage.getItem('previewRecords');
+        if (stored) {
+            const obj = JSON.parse(stored);
+            if (obj.expiresAt && Date.now() > obj.expiresAt) {
+                localStorage.removeItem('previewRecords');
+            }
+        }
+    } catch { }
     initialize();
 });
 
@@ -41,6 +51,38 @@ async function handleSendRecords() {
     showMessage('Enviando registros al servidor...', 'info');
 
     try {
+        // Guardar los registros en localStorage con timestamp y expiración a las 23:59
+        const now = new Date();
+        const expiresAt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 0, 0).getTime();
+
+        // Obtener registros previos
+        let prev = [];
+        try {
+            const stored = localStorage.getItem('previewRecords');
+            if (stored) {
+                const obj = JSON.parse(stored);
+                if (Array.isArray(obj.records)) {
+                    prev = obj.records;
+                }
+            }
+        } catch { }
+
+        // Fusionar y mantener únicos por code
+        const allRecords = [...prev, ...records];
+        const uniqueRecords = Object.values(
+            allRecords.reduce((acc, rec) => {
+                acc[rec.code] = rec;
+                return acc;
+            }, {})
+        );
+
+        const dataToStore = {
+            records: uniqueRecords,
+            savedAt: now.getTime(),
+            expiresAt
+        };
+        localStorage.setItem('previewRecords', JSON.stringify(dataToStore));
+
         const result = await sendRecordsWithRetry(records);
         if (result.success) {
             showMessage(`${result.recordsCount} registros enviados correctamente`, 'success');

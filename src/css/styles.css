@@ -159,7 +159,8 @@ main {
   border: 1px solid var(--color-gray-medium);
   border-radius: 8px;
   padding: 1rem;
-  margin-bottom: 0.75rem;
+  width: 90vw;
+  margin: 0 auto 0.75rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   .luggage-header {
@@ -206,6 +207,13 @@ main {
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 44px;
+}
+
+.link-button {
+  text-decoration: none;
+  display: inline-block;
+  color: white;
+  background-color: var(--color-engineering-orange);
 }
 
 .primary-button {
@@ -279,21 +287,25 @@ main {
   }
 }
 
-/* Footer and Actions */
-footer {
+.actions-section {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  background: var(--color-gray-light);
-  padding: 1rem;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  padding: .5rem;
 }
 
 #actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
+}
+
+footer{
+  background-color: var(--color-engineering-orange);
+  color: var(--color-white);
+  text-align: center;
+  padding-block: 1px;
 }
 
 /* Modal */

@@ -41,14 +41,14 @@ function attachGlobalEventListeners() {
 async function handleSendRecords() {
     const records = getAllRecords();
     if (records.length === 0) {
-        showMessage('No hay registros para enviar', 'error');
+        showMessage('No hay registros para guardar', 'error');
         return;
     }
 
     const sendButton = document.getElementById('send-button');
     sendButton.disabled = true;
-    sendButton.textContent = 'Enviando...';
-    showMessage('Enviando registros al servidor...', 'info');
+    sendButton.textContent = 'Guardando...';
+    showMessage('Guardando registros...', 'info');
 
     try {
         // Guardar los registros en localStorage con timestamp y expiración a las 23:59
@@ -85,7 +85,7 @@ async function handleSendRecords() {
 
         const result = await sendRecordsWithRetry(records);
         if (result.success) {
-            showMessage(`${result.recordsCount} registros enviados correctamente`, 'success');
+            showMessage(`${result.recordsCount} registros guardados`, 'success');
             clearAllRecords();
             renderLuggageList();
         }

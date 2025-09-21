@@ -83,7 +83,6 @@ export function renderLuggageList() {
     //     date.textContent = `Fecha: ${dateIn}`;
     // }
 
-
     if (records.length === 0) {
         luggageListEl.innerHTML = '<li class="empty-message">No hay maletas escaneadas</li>';
     } else {
@@ -135,7 +134,7 @@ function createLuggageItemHtml(record) {
 function updateSendButton() {
     const count = getRecordsCount();
     sendButton.disabled = count === 0;
-    sendButton.textContent = `Enviar${count === 0 ? '' : ` (${count})`}`;
+    sendButton.textContent = `Guardar${count === 0 ? '' : ` (${count})`}`;
 }
 
 /**

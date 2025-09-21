@@ -26,16 +26,16 @@
     <section id="scanner-section">
       <div id="scanner-container">
         <video id="video" autoplay playsinline></video>
-        <div id="scanner-status">Initializing camera...</div>
+        <div id="scanner-status">cargando...</div>
       </div>
     </section>
 
     <section id="list-section">
       <div class="luggage-header-container">
-        <h2>Scanned Luggage</h2>
+        <h2>Maletas Escanedas</h2>
         <div id="luggage-header">
           <span id="user-span" class="user-interactive" title="Editar encargado">
-            Encargado: <span id="user-name"></span> <span style="font-size:1.2em;vertical-align:middle">&#128100;</span>
+            Encargado: <span id="user-name"></span>
           </span>
           <div class="shift-date-row">
             <span id="shift" class="shift-label">Turno:</span>
@@ -48,19 +48,20 @@
 
   </main>
 
-  <footer>
+  <section class="actions-section">
     <div id="actions">
-      <button id="send-button" class="button primary-button" disabled>Send Records</button>
-      <button id="clear-button" class="button secondary-button">Clear List</button>
+      <button id="send-button" class="button primary-button" disabled>Guardar</button>
+      <button id="clear-button" class="button secondary-button">Vaciar</button>
+      <a href="preview.html" class="button link-button">Previsualizar</a>
     </div>
-  </footer>
+  </section>
 
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal" id="observation-modal">
-      <h3>Observations</h3>
-      <textarea id="observation-textarea" placeholder="Describe specific details of the damage..." rows="4"></textarea>
+      <h3>Observaciones</h3>
+      <textarea id="observation-textarea" placeholder="Detalles adicionales..." rows="4"></textarea>
       <div class="modal-actions">
-        <button id="modal-accept-button" class="button primary-button">Accept</button>
+        <button id="modal-accept-button" class="button primary-button">Aceptar</button>
       </div>
     </div>
   </div>
@@ -68,13 +69,16 @@
   <!-- Modal para nombre de operario -->
   <div class="modal-overlay" id="user-modal-overlay" style="display:none;">
     <div class="modal" id="user-modal">
-      <h3>Nombre de Operario</h3>
+      <h3>Encargado</h3>
       <input id="user-input" type="text" placeholder="Ingresa tu nombre..." autocomplete="off" />
       <div class="modal-actions">
         <button id="user-accept-button" class="button primary-button">Aceptar</button>
       </div>
     </div>
   </div>
+  <!-- <footer>
+    <p><small>&copy; 2025 RegisDaños | Desarrollado por Hernán B. Apaza</small></p>
+  </footer> -->
 
   <script src="https://unpkg.com/@zxing/library@0.21.3"></script>
   <script type="module" src="src/js/app.js"></script>

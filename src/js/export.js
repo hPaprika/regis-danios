@@ -11,24 +11,24 @@ function getData() {
   try {
     const rawData = localStorage.getItem("previewRecords");
     if (!rawData) return [];
-    
+
     const parsedData = JSON.parse(rawData);
-    
+
     // Verificar si tiene la estructura con 'records'
     if (parsedData.records && Array.isArray(parsedData.records)) {
       console.log("Datos cargados:", parsedData.records.length, "registros");
       return parsedData.records;
     }
-    
+
     // Si es un array directo (formato anterior)
     if (Array.isArray(parsedData)) {
       console.log("Datos formato directo:", parsedData.length, "registros");
       return parsedData;
     }
-    
+
     console.warn("Formato de datos no reconocido:", parsedData);
     return [];
-    
+
   } catch (error) {
     console.error("Error parsing localStorage data:", error);
     return [];
@@ -62,7 +62,7 @@ function loadData() {
 function renderPreview() {
   const data = getData();
   const container = elements.previewContainer;
-  
+
   // Update header info
   elements.title.textContent = `Registro de Daños - ${formatDate()}`;
   elements.count.textContent = `Total: ${data.length} registros`;
@@ -125,7 +125,7 @@ function createCard(item, cardNumber, isExport = false) {
     ctx.fillStyle = '#666';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('Error', canvas.width/2, canvas.height/2);
+    ctx.fillText('Error', canvas.width / 2, canvas.height / 2);
   }
 
   // Code number
@@ -136,26 +136,26 @@ function createCard(item, cardNumber, isExport = false) {
   // ABC indicators - PROCESAMIENTO CORREGIDO
   const abcRow = document.createElement("div");
   abcRow.className = "abc-row";
-  
+
   // Función para procesar categories según tu formato
   function getActiveCategories(categories) {
     if (categories && typeof categories === 'object' && !Array.isArray(categories)) {
       const active = [];
       if (categories.A === true) active.push('A');
-      if (categories.B === true) active.push('B');  
+      if (categories.B === true) active.push('B');
       if (categories.C === true) active.push('C');
       return active;
     }
-    
+
     if (typeof categories === 'string') {
       return categories.split(',').map(c => c.trim()).filter(c => c !== '');
     }
-    
+
     return [];
   }
-  
+
   const activeCategories = getActiveCategories(item.categories);
-  
+
   ["A", "B", "C"].forEach(letter => {
     const box = document.createElement("div");
     box.className = `abc-box ${activeCategories.includes(letter) ? 'active' : 'inactive'}`;
@@ -165,10 +165,10 @@ function createCard(item, cardNumber, isExport = false) {
 
   // Observation
   const observation = document.createElement("div");
-  const obsText = (item.observation && typeof item.observation === 'string' && item.observation.trim() !== '') 
-    ? item.observation.trim() 
+  const obsText = (item.observation && typeof item.observation === 'string' && item.observation.trim() !== '')
+    ? item.observation.trim()
     : "Sin observaciones";
-  
+
   observation.className = `observation ${obsText === "Sin observaciones" ? 'empty' : ''}`;
   observation.textContent = obsText;
 
@@ -185,7 +185,7 @@ function renderExportView() {
   const data = getData();
   const user = getUserData();
   const container = elements.exportView;
-  
+
   // Get shift info from first record or default
   const shift = data.length > 0 ? data[0].shift || "Turno General" : "Turno General";
 
@@ -228,7 +228,7 @@ async function exportAsImage() {
 
   try {
     renderExportView();
-    
+
     const canvas = await html2canvas(elements.exportView, {
       scale: 2,
       useCORS: true,
@@ -265,7 +265,7 @@ async function shareWhatsApp() {
 
   try {
     renderExportView();
-    
+
     const canvas = await html2canvas(elements.exportView, {
       scale: 1.5,
       useCORS: true,
@@ -285,8 +285,8 @@ async function shareWhatsApp() {
       const file = new File([blob], `maletas_${formatDate().replace(/\//g, '-')}.png`, {
         type: 'image/png'
       });
-      
-      if (navigator.canShare({files: [file]})) {
+
+      if (navigator.canShare({ files: [file] })) {
         await navigator.share({
           title: 'Registro de Daños',
           text: message,
@@ -299,7 +299,7 @@ async function shareWhatsApp() {
     // Fallback to WhatsApp Web
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    
+
     // Also create download link as backup
     const link = document.createElement("a");
     link.download = `maletas_${formatDate().replace(/\//g, '-')}.png`;
@@ -324,6 +324,38 @@ function initEventListeners() {
   document.getElementById("export-btn").addEventListener("click", exportAsImage);
   document.getElementById("whatsapp-btn").addEventListener("click", shareWhatsApp);
   document.getElementById("clear-btn").addEventListener("click", clearRecords);
+  document.getElementById("send-btn").addEventListener("click", sendRecordsToSheets);
+}
+
+// ===== ENVÍO DE REGISTROS A SHEETS =====
+import { sendRecordsWithRetry } from "./api.js";
+
+async function sendRecordsToSheets() {
+  const btn = document.getElementById("send-btn");
+  btn.disabled = true;
+  btn.textContent = "Enviando...";
+  try {
+    const stored = localStorage.getItem("previewRecords");
+    let records = [];
+    if (stored) {
+      const obj = JSON.parse(stored);
+      if (Array.isArray(obj.records)) records = obj.records;
+      else if (Array.isArray(obj)) records = obj;
+    }
+    if (records.length === 0) {
+      alert("No hay registros para enviar");
+      return;
+    }
+    const result = await sendRecordsWithRetry(records);
+    if (result.success) {
+      alert(`${records.length} registros enviados correctamente a Sheets.`);
+    }
+  } catch (err) {
+    alert("Error enviando registros: " + (err.message || err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Enviar";
+  }
 }
 
 function initSystem() {

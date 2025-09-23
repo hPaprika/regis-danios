@@ -1,5 +1,5 @@
 // Comunicación con la API
-const API_URL = 'https://script.google.com/macros/s/AKfycbw3q_TLfSMWDylaAGbGmqU0L-B4k28Z4NVdQ3AIFddiqvc_9WRjdTkrnhhONw109ulu0Q/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzVIkNxvdcYxcj8hG2pqnqKWvQ21Yno4beFFSZzb5Vm0zbI0nEhImRZw8OzMTdjwCrydw/exec';
 const API_TIMEOUT_MS = 15000;
 
 /**
@@ -51,12 +51,25 @@ export async function sendRecordsWithRetry(records, maxRetries = 3) {
  * @returns {object} El registro formateado.
  */
 function formatRecordForApi(record) {
+  // Mapeo de categorías a términos legibles en español
+  const categoryMap = {
+    'A': 'Asa rota',
+    'B': 'Maleta rota', 
+    'C': 'Rueda rota'
+  };
+  
+  // Convertir categorías activas a texto legible
+  const activeCategories = Object.entries(record.categories)
+    .filter(([key, value]) => value === true)
+    .map(([key]) => categoryMap[key])
+    .join(', ');
+
   return {
-    code: record.code,
-    categories: Object.entries(record.categories).filter(([, v]) => v).map(([k]) => k).join(', '),
-    observation: record.observation,
-    dateTime: record.dateTime,
-    user: record.user,
-    shift: record.shift,
+    codigo: record.code,
+    categorias: activeCategories || 'Sin daños',
+    observacion: record.observation || 'Sin observaciones',
+    fechaHora: record.dateTime,
+    usuario: record.user,
+    turno: record.shift,
   };
 }

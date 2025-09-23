@@ -1,101 +1,36 @@
-# 🧳 Escáner de Maletas Dañadas – PWA
+# 🧳 Escáner de Maletas Dañadas
 
-Aplicación web progresiva (PWA) para **escanear, categorizar y registrar maletas dañadas** en aeropuertos, con envío directo a Google Sheets mediante Google Apps Script. Optimizada para móviles y uso rápido por operarios.
-
----
-
-## 🚀 Características principales
-
-- **Escaneo de códigos de barras** usando la cámara trasera (ZXing vía CDN).
-- **Registro automático** de los 6 últimos dígitos del código.
-- **Prevención de duplicados** y feedback sonoro (éxito/error).
-- **Categorización inmediata**:  
-  - A = Asa rota  
-  - B = Maleta rota  
-  - C = Rueda rota  
-  - OBS = Observaciones (modal con blur)
-- **Registro de observaciones** por modal minimalista.
-- **Envío masivo** de registros a Google Sheets (Apps Script backend).
-- **Gestión de usuario** (nombre del operario).
-- **Turno automático** según hora (BRC-ERC / IRC-KRC).
-- **Vaciar lista** de registros con confirmación.
-- **PWA instalable** y funcional offline (shell).
-- **Interfaz móvil optimizada** y accesible.
+Una aplicación web sencilla diseñada para el personal del aeropuerto para escanear, categorizar y registrar rápidamente el equipaje dañado. Es una Aplicación Web Progresiva (PWA), lo que significa que está optimizada para dispositivos móviles e incluso se puede "instalar" en la pantalla de inicio de un teléfono para un acceso rápido.
 
 ---
 
-## 📦 Estructura del proyecto
+## ✨ Características Principales
 
-```
-├── index.html
-├── src/
-│   ├── css/
-│   │   └── styles.css
-│   └── js/
-│       ├── app.js         # Coordinador principal
-│       ├── scanner.js     # Lógica de escaneo (ZXing)
-│       ├── storage.js     # Almacenamiento en memoria
-│       ├── ui.js          # Manejo de UI y modales
-│       └── api.js         # Comunicación con Apps Script
-├── public/
-│   ├── manifest.json
-│   ├── service-worker.js
-│   └── icons/
-├── PRD.md                 # Documento de requerimientos
-└── README.md
-```
+- **Escaneo de Códigos de Barras:** Utiliza la cámara de tu teléfono para escanear las etiquetas del equipaje al instante.
+- **Registro Automático:** Captura los últimos 6 dígitos del código de la etiqueta.
+- **Categorización de Daños:** Etiqueta rápidamente el tipo de daño:
+    - **A:** Asa rota
+    - **B:** Maleta rota
+    - **C:** Rueda rota
+    - **OBS:** Añade notas personalizadas para otros problemas.
+- **Prevención de Duplicados:** Evita escanear la misma maleta dos veces.
+- **Carga en Lote:** Envía todos los informes registrados a una hoja de cálculo de Google compartida de una sola vez.
+- **Información Inteligente:** Registra automáticamente el nombre del operador y el turno.
+- **Funciona sin Conexión:** La aplicación base funciona incluso sin conexión a internet.
 
 ---
 
-## 🛠️ Uso
+## 🚀 Cómo Usar
 
-1. **Abre la app** en tu móvil o PC.
-2. **Ingresa tu nombre** en el panel inferior.
-3. **Escanea el código de la maleta** con la cámara trasera.
-4. **Marca las categorías** de daño y agrega observaciones si es necesario.
-5. **Envía los registros** a Google Sheets con el botón "Enviar Registros".
-6. **Vacía la lista** si deseas limpiar todos los registros locales.
-
----
-
-## 📝 Personalización
-
-- **Colores y estilos:** [`src/css/styles.css`](src/css/styles.css).
-- **Categorías:** [`src/js/ui.js`](src/js/ui.js) y [`src/js/storage.js`](src/js/storage.js).
-- **Validaciones y reglas:** [`src/js/scanner.js`](src/js/scanner.js) y [`src/js/storage.js`](src/js/storage.js).
+1.  **Abre la Aplicación:** Navega a la URL de la aplicación en tu teléfono u ordenador.
+2.  **Ingresa tu Nombre:** Escribe tu nombre en el campo de la parte inferior. Se usará para identificar tus informes.
+3.  **Escanea la Etiqueta del Equipaje:** Apunta la cámara trasera al código de barras de la etiqueta del equipaje. El código aparecerá en la lista.
+4.  **Categoriza el Daño:** Toca los botones (`A`, `B`, `C`) para marcar el tipo de daño. Usa `OBS` para añadir notas específicas si es necesario.
+5.  **Envía tus Informes:** Una vez que hayas registrado todas las maletas dañadas, toca el botón "Enviar Registros" para subir todo a la hoja de cálculo de Google.
+6.  **Limpia la Lista:** Si necesitas empezar de nuevo, toca "Vaciar Lista" para eliminar todos los elementos escaneados de la pantalla.
 
 ---
 
-## 🧑‍💻 Tecnologías usadas
+## 🛠️ Tecnologías Utilizadas
 
-- **HTML5, CSS3, JavaScript (ES2023+)**
-- **ZXing** para escaneo de códigos ([CDN](https://unpkg.com/@zxing/library@0.21.3))
-- **Google Apps Script** (backend)
-- **PWA**: manifest y service worker básico
-
----
-
-## 🛡️ Seguridad y consideraciones
-
-- El backend solo acepta solicitudes POST con formato válido.
-- El acceso a la hoja de cálculo depende de la configuración de Apps Script.
-- No se almacena información sensible en el frontend.
-
----
-
-## 📄 Licencia
-
-MIT
-
----
-
-## 🧪 Pruebas
-
-- Usa [`test.html`](public/test.html) para pruebas manuales del endpoint de Apps Script.
-
----
-
-## 📝 Notas finales
-
-- Para soporte, reporta issues en el repositorio.
-- Si necesitas adaptar el flujo, revisa el [PRD.md](PRD.md) para los criterios de aceptación y requerimientos.
+Este proyecto está construido con HTML, CSS y JavaScript puros, utilizando la librería ZXing para el escaneo de códigos de barras. Los datos se envían a un backend de Google Apps Script que alimenta una hoja de cálculo de Google.

@@ -1,90 +1,13 @@
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escáner de Maletas Dañadas</title>
-  <!DOCTYPE html>
-  <html lang="es">
-
+<!doctype html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RegisDaños</title>
-    <link rel="stylesheet" href="src/css/styles.css">
-    <link rel="manifest" href="/manifest.json">
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>regis-danios-mb</title>
   </head>
-
-<body>
-  <header>
-    <h1>RegisDaños</h1>
-    <p>Apunta la camara al codigo de barras de la maleta</p>
-  </header>
-
-  <main>
-    <section id="scanner-section">
-      <div id="scanner-container">
-        <video id="video" autoplay playsinline></video>
-        <div id="scanner-status">cargando...</div>
-      </div>
-    </section>
-
-    <section id="list-section">
-      <div class="luggage-header-container">
-        <h2>Maletas Escanedas</h2>
-        <div id="luggage-header">
-          <span id="user-span" class="user-interactive" title="Editar encargado">
-            Encargado: <span id="user-name"></span>
-          </span>
-          <div class="shift-date-row">
-            <span id="shift" class="shift-label">Turno:</span>
-            <span id="date" class="date-label">Fecha:</span>
-          </div>
-        </div>
-      </div>
-      <ul id="luggage-list" class="luggage-list"></ul>
-    </section>
-
-  </main>
-
-  <section class="actions-section">
-    <div id="actions">
-      <button id="send-button" class="button primary-button" disabled>Guardar</button>
-      <button id="clear-button" class="button secondary-button">Vaciar</button>
-      <a href="preview.html" class="button link-button">Previsualizar</a>
-    </div>
-  </section>
-
-  <div class="modal-overlay" id="modal-overlay">
-    <div class="modal" id="observation-modal">
-      <h3>Observaciones</h3>
-      <textarea id="observation-textarea" placeholder="Detalles adicionales..." rows="4"></textarea>
-      <div class="modal-actions">
-        <button id="modal-accept-button" class="button primary-button">Aceptar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal para nombre de operario -->
-  <div class="modal-overlay" id="user-modal-overlay" style="display:none;">
-    <div class="modal" id="user-modal">
-      <h3>Encargado</h3>
-      <input id="user-input" type="text" placeholder="Ingresa tu nombre..." autocomplete="off" />
-      <div class="modal-actions">
-        <button id="user-accept-button" class="button primary-button">Aceptar</button>
-      </div>
-    </div>
-  </div>
-  <!-- <footer>
-    <p><small>&copy; 2025 RegisDaños | Desarrollado por Hernán B. Apaza</small></p>
-  </footer> -->
-
-  <script src="https://unpkg.com/@zxing/library@0.21.3"></script>
-  <script type="module" src="src/js/app.js"></script>
-</body>
-
-</html>
-</body>
-
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

@@ -31,13 +31,13 @@ const SiberiaPage = () => {
   const commonFlights = ["2328", "2010", "2366"];
 
   // Helper: compress image using canvas (client-side)
-  async function compressImage(
+  const compressImage = async (
     file: File,
     maxWidth = 1280,
     maxHeight = 1280,
     quality = 0.75,
     outputType: string = "image/jpeg"
-  ): Promise<Blob> {
+  ): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error("FileReader error"));
@@ -288,7 +288,7 @@ const SiberiaPage = () => {
         <div className="p-6 max-w-md mx-auto space-y-6">
           {/* Code Section */}
           <div className="space-y-3">
-            <Label htmlFor="code">Código de Maleta (6 dígitos)</Label>
+            <Label htmlFor="code">Código de Maleta</Label>
             <div className="flex gap-2">
               <Input
                 id="code"
@@ -319,7 +319,7 @@ const SiberiaPage = () => {
 
           {/* Flight Number */}
           <div className="space-y-2">
-            <Label htmlFor="flight">Número de Vuelo (4 dígitos)</Label>
+            <Label htmlFor="flight">Número de Vuelo</Label>
             <Input
               id="flight"
               type="text"
@@ -341,9 +341,6 @@ const SiberiaPage = () => {
                 <option key={flight} value={flight} />
               ))}
             </datalist>
-            <p className="text-xs text-muted-foreground">
-              Sugerencias: {commonFlights.join(", ")}
-            </p>
           </div>
 
           {/* Signature Toggle */}

@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogOut, Loader2 } from "lucide-react";
-import counterImage from "@/assets/counter-card.png";
-import siberiaImage from "@/assets/siberia-card.jpg";
+import counterImage from "@/assets/counter-card.webp";
+import siberiaImage from "@/assets/siberia-card.webp";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const Index = () => {
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       if (!session) {
         navigate("/login");
       } else {
@@ -70,7 +70,7 @@ const Index = () => {
         </Button>
       </div>
 
-      <header className="mb-8 text-center">
+      <header className="mb-4 text-center">
         <h1 className="text-3xl font-bold text-foreground mb-2">Sistema de Gestión</h1>
         <p className="text-muted-foreground">Selecciona una opción</p>
       </header>
@@ -87,7 +87,7 @@ const Index = () => {
               className="w-full h-48 object-cover rounded-t-lg"
             />
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="pb-3">
             <CardTitle className="text-2xl mb-2">Counter</CardTitle>
             <CardDescription className="text-base">
               Registrar maletas dañadas
@@ -106,7 +106,7 @@ const Index = () => {
               className="w-full h-48 object-cover rounded-t-lg"
             />
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="pb-3">
             <CardTitle className="text-2xl mb-2">Siberia</CardTitle>
             <CardDescription className="text-base">
               Observación y reporte de daños

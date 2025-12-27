@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, Home, Scan, Upload, X, List } from "lucide-react";
+import { Camera, Home, Scan, Upload, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,8 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScannerView } from "@/components/ScannerView";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 const SiberiaPage = () => {
   const navigate = useNavigate();
@@ -23,9 +22,6 @@ const SiberiaPage = () => {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [showRecords, setShowRecords] = useState(false);
-  const [records, setRecords] = useState<any[]>([]);
-  const [isLoadingRecords, setIsLoadingRecords] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const commonFlights = ["2328", "2010", "2366"];
@@ -73,29 +69,7 @@ const SiberiaPage = () => {
     });
   }
 
-  const fetchRecords = async () => {
-    setIsLoadingRecords(true);
-    try {
-      const { data, error } = await supabase
-        .from("siberia")
-        .select("*")
-        .order("created_at", { ascending: false });
 
-      if (error) throw error;
-
-      setRecords(data || []);
-    } catch (error) {
-      console.error("Error fetching records:", error);
-      toast.error("No se pudieron cargar los registros");
-    } finally {
-      setIsLoadingRecords(false);
-    }
-  };
-
-  const handleOpenRecords = () => {
-    setShowRecords(true);
-    fetchRecords();
-  };
 
   const handleScan = (scannedCode: string, isSuccess: boolean) => {
     if (isSuccess && scannedCode) {
@@ -106,13 +80,6 @@ const SiberiaPage = () => {
       toast.success(`Código escaneado: ${scannedCode.slice(-6)}`);
     }
   };
-
-  // const handleManualCode = (manualCode: string) => {
-  //   setCode(manualCode);
-  //   setFullCode(manualCode);
-  //   setShowManualEntry(false);
-  //   toast.success(`Código ingresado: ${manualCode}`);
-  // };
 
   const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -247,24 +214,14 @@ const SiberiaPage = () => {
               <p className="text-sm opacity-90">Escanea y documenta el daño</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleOpenRecords}
-              className="text-primary-foreground hover:bg-primary-foreground/20"
-            >
-              <List className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/")}
-              className="text-primary-foreground hover:bg-primary-foreground/20"
-            >
-              <Home className="w-5 h-5" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/")}
+            className="text-primary-foreground hover:bg-primary-foreground/20"
+          >
+            <Home className="w-5 h-5" />
+          </Button>
         </div>
       </header>
 
@@ -441,70 +398,17 @@ const SiberiaPage = () => {
         </div>
       )}
 
-      {/* Records Dialog */}
-      <Dialog open={showRecords} onOpenChange={setShowRecords}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle>Registros de Daños</DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="h-[60vh]">
-            {isLoadingRecords ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
-              </div>
-            ) : records.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No hay registros guardados
-              </div>
-            ) : (
-              <div className="space-y-4 pr-4">
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className="border rounded-lg p-4 space-y-3"
-                  >
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <span className="font-medium">Código:</span>{" "}
-                        {record.codigo}
-                      </div>
-                      <div>
-                        <span className="font-medium">Vuelo:</span>{" "}
-                        {record.vuelo}
-                      </div>
-                      <div>
-                        <span className="font-medium">Fecha:</span>{" "}
-                        {new Date(record.fecha_hora).toLocaleString("es-CL")}
-                      </div>
-                      <div>
-                        <span className="font-medium">Firma:</span>{" "}
-                        {record.firma ? "Sí" : "No"}
-                      </div>
-                    </div>
-                    {record.observacion && (
-                      <div className="text-sm">
-                        <span className="font-medium">Observaciones:</span>
-                        <p className="text-muted-foreground mt-1">
-                          {record.observacion}
-                        </p>
-                      </div>
-                    )}
-                    {record.imagen_url && (
-                      <div>
-                        <img
-                          src={record.imagen_url}
-                          alt={`Daño ${record.codigo}`}
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+      {/* Footer - Botón para ver registros */}
+      <footer className="bg-card border-t px-4 py-4 shadow-lg">
+        <Button
+          onClick={() => navigate("/photolog")}
+          className="w-full"
+          size="lg"
+        >
+          <FileText className="w-5 h-5 mr-2" />
+          Ver Registros
+        </Button>
+      </footer>
     </div>
   );
 };

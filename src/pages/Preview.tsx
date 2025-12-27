@@ -278,7 +278,7 @@ const Preview = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground">
-              Previsualización
+              Registros guardados
             </h1>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Luggage className="size-4" />
@@ -301,7 +301,7 @@ const Preview = () => {
                 <Input
                   id="encargado"
                   type="text"
-                  placeholder="Encargado"
+                  placeholder="Apellido"
                   value={metadata.user === "desconocido" ? "" : metadata.user}
                   onChange={(e) =>
                     setMetadata((prev: typeof metadata) => ({
@@ -350,6 +350,7 @@ const Preview = () => {
                   <SelectItem value="LATAM">LATAM</SelectItem>
                   <SelectItem value="SKY">SKY</SelectItem>
                   <SelectItem value="JET SMART">JET SMART</SelectItem>
+                  <SelectItem value="AVIANCA">AVIANCA</SelectItem>
                 </SelectContent>
               </Select>
             </div>

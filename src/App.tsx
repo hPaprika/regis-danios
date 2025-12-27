@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import CounterPage from "./pages/CounterPage";
 import Preview from "./pages/Preview";
 import SiberiaPage from "./pages/SiberiaPage";
+import PhotologPage from "./pages/PhotologPage";
 import Records from "./pages/Records";
 import NotFound from "./pages/NotFound";
 
@@ -45,6 +46,14 @@ const App = () => (
           element={
             <ProtectedRoute>
               <SiberiaPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/photolog"
+          element={
+            <ProtectedRoute>
+              <PhotologPage />
             </ProtectedRoute>
           }
         />

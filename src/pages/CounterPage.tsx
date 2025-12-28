@@ -25,7 +25,7 @@ const Index = () => {
     }
     return [];
   });
-  
+
   const [showSavedMessage, setShowSavedMessage] = useState(false);
   const [savedRecordCount, setSavedRecordCount] = useState(0);
   const [manualCodeModalOpen, setManualCodeModalOpen] = useState(false);
@@ -169,20 +169,6 @@ const Index = () => {
     navigate("/preview");
   };
 
-  // Check if there are saved records in localStorage
-  const hasSavedRecords = () => {
-    const saved = localStorage.getItem("luggageRecords");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) && parsed.length > 0;
-      } catch {
-        return false;
-      }
-    }
-    return false;
-  };
-
   const handleClear = () => {
     if (window.confirm("¿Estás seguro de que deseas eliminar todos los registros?")) {
       setRecords([]);
@@ -196,8 +182,8 @@ const Index = () => {
     <div className="flex flex-col h-screen bg-background">
       <Header />
 
-      <ScannerView 
-        onScan={handleScan} 
+      <ScannerView
+        onScan={handleScan}
         showManualButton={true}
         onManualClick={() => setManualCodeModalOpen(true)}
       />
@@ -217,7 +203,6 @@ const Index = () => {
         onSend={handleSend}
         onPreview={handlePreview}
         onClear={handleClear}
-        hasPreviewRecords={hasSavedRecords()}
       />
 
       <ManualCodeModal

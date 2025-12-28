@@ -1,19 +1,17 @@
 import { Button } from "./ui/button";
-import { Send, FileText } from "lucide-react";
+import { Send, List } from "lucide-react";
 
 interface FooterActionsProps {
   recordsCount: number;
   onSend: () => void;
   onPreview: () => void;
   onClear: () => void;
-  hasPreviewRecords: boolean;
 }
 
 export const FooterActions = ({
   recordsCount,
   onSend,
   onPreview,
-  hasPreviewRecords,
 }: FooterActionsProps) => {
   const hasRecords = recordsCount > 0;
 
@@ -31,12 +29,11 @@ export const FooterActions = ({
 
         <Button
           onClick={onPreview}
-          disabled={!hasPreviewRecords}
           variant="outline"
           className="flex-1 h-12 text-base font-semibold border-2 disabled:opacity-50"
         >
-          <FileText className="w-5 h-5 mr-2" />
-          Previsualizar
+          <List className="w-5 h-5 mr-2" />
+          Ver registros
         </Button>
       </div>
       {/* 

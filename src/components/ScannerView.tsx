@@ -43,7 +43,7 @@ export const ScannerView = ({ onScan, showManualButton = true, onManualClick }: 
     onScanRef.current(code, true);
 
     // Clear last scanned visual after 2 seconds
-    setTimeout(() => setLastScanned(""), 2000);
+    setTimeout(() => setLastScanned(""), 1000);
   }, []);
 
   useEffect(() => {
@@ -152,14 +152,13 @@ export const ScannerView = ({ onScan, showManualButton = true, onManualClick }: 
 
       {/* Floating manual code button */}
       {showManualButton && onManualClick && (
-        <div className="absolute bottom-4 right-4 z-50">
+        <div className="absolute bottom-4 right-4 z-10">
           <Button
             onClick={onManualClick}
             variant="secondary"
-            className="shadow-lg"
+            className="shadow-lg border-2 border-black/80 bg-secondary/70"
           >
-            <Keyboard className="w-4 h-4 mr-2" />
-            Manual
+            <Keyboard className="w-4 h-4 opacity-100" />
           </Button>
         </div>
       )}

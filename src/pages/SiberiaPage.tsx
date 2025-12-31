@@ -69,8 +69,6 @@ const SiberiaPage = () => {
     });
   }
 
-
-
   const handleScan = (scannedCode: string, isSuccess: boolean) => {
     if (isSuccess && scannedCode) {
       // Save full code internally, display last 6 digits
@@ -316,12 +314,12 @@ const SiberiaPage = () => {
             </Label>
           </div>
 
-          {/* Photo Capture */}
           <div className="space-y-3">
-            <Label>Foto del Daño (Obligatorio)</Label>
+            <Label>Foto del Daño</Label>
 
             {!photoPreview ? (
               <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                {/* Input único que abre cámara pero permite cambiar a galería */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -338,7 +336,7 @@ const SiberiaPage = () => {
                   disabled={isUploading}
                 >
                   <Camera className="w-4 h-4 mr-2" />
-                  Tomar Foto
+                  Cargar Foto
                 </Button>
               </div>
             ) : (
@@ -350,25 +348,16 @@ const SiberiaPage = () => {
                     className="w-full h-64 object-cover"
                   />
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={handleRetakePhoto}
-                    disabled={isUploading}
-                  >
-                    <Camera className="w-4 h-4 mr-2" />
-                    Retomar
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={handleSubmit}
-                    disabled={isUploading}
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Confirmar
-                  </Button>
-                </div>
+                {/* Botón Retomar (ancho completo) */}
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleRetakePhoto}
+                  disabled={isUploading}
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Cancelar
+                </Button>
               </div>
             )}
           </div>
@@ -398,16 +387,30 @@ const SiberiaPage = () => {
         </div>
       )}
 
-      {/* Footer - Botón para ver registros */}
+      {/* Footer - Botones de acción */}
       <footer className="bg-card border-t px-4 py-4 shadow-lg">
-        <Button
-          onClick={() => navigate("/photolog")}
-          className="w-full"
-          size="lg"
-        >
-          <FileText className="w-5 h-5 mr-2" />
-          Ver Registros
-        </Button>
+        <div className="flex gap-3">
+          {/* Botón Ver Registros */}
+          <Button
+            onClick={() => navigate("/photolog")}
+            variant="outline"
+            className="flex-1"
+            size="lg"
+          >
+            <FileText className="w-5 h-5 mr-2" />
+            Ver Registros
+          </Button>
+          {/* Botón Confirmar */}
+          <Button
+            onClick={handleSubmit}
+            disabled={!photoFile || isUploading}
+            className="flex-1"
+            size="lg"
+          >
+            <Upload className="w-5 h-5 mr-2" />
+            Confirmar
+          </Button>
+        </div>
       </footer>
     </div>
   );

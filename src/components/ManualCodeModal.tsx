@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 
 interface ManualCodeModalProps {
   open: boolean;
@@ -29,29 +28,24 @@ export const ManualCodeModal = ({ open, onSubmit, onCancel }: ManualCodeModalPro
     <Dialog open={open} onOpenChange={handleCancel}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Ingresar Código Manualmente</DialogTitle>
+          <DialogTitle>Ingresar código manualmente</DialogTitle>
         </DialogHeader>
-        <div className="py-4">
-          <Label htmlFor="manual-code">Código (6 dígitos)</Label>
-          <Input
-            id="manual-code"
-            type="text"
-            maxLength={6}
-            pattern="\d*"
-            inputMode="numeric"
-            placeholder="000000"
-            value={code}
-            onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, "");
-              setCode(value);
-            }}
-            className="mt-2 text-lg text-center tracking-wider"
-          />
-        </div>
+        <Input
+          id="manual-code"
+          type="text"
+          maxLength={6}
+          pattern="\d*"
+          inputMode="numeric"
+          placeholder="000000"
+          autoComplete="off"
+          value={code}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, "");
+            setCode(value);
+          }}
+          className="text-lg text-center tracking-wider"
+        />
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
-            Cancelar
-          </Button>
           <Button
             onClick={handleSubmit}
             disabled={code.length !== 6}

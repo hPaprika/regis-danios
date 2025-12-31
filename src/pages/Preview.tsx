@@ -1,22 +1,15 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAutoClearRecords } from "@/hooks/useAutoClearRecords";
 import { type LuggageRecord } from "@/types/luggage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Luggage, User } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeft, Search, Image, Trash2, Upload, Database } from "lucide-react";
+import { Luggage } from "lucide-react";
+import { ArrowLeft, Search, Save, Database } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PreviewRecordCard } from "@/components/PreviewRecordCard";
 import { ObservationModal } from "@/components/ObservationModal";
+import { MetadataModal } from "@/components/MetadataModal";
 import { PrintableReport } from "@/components/PrintableReport";
 import { toPng } from "html-to-image";
 import { toast } from "sonner";
@@ -24,10 +17,18 @@ import { toast } from "sonner";
 const Preview = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [observationModalOpen, setObservationModalOpen] = useState(false);
+  const [metadataModalOpen, setMetadataModalOpen] = useState(false);
   const [currentEditingCode, setCurrentEditingCode] = useState<string | null>(null);
+
+  // Metadata for printable report (updated when saving)
+  const [reportMetadata, setReportMetadata] = useState({
+    user: "Encargado",
+    shift: "Turno",
+    airline: "Aerolínea",
+    dateTime: new Date().toLocaleString("es-ES"),
+  });
 
   // Load records from localStorage
   const [records, setRecords] = useState<LuggageRecord[]>(() => {
@@ -54,38 +55,6 @@ const Preview = () => {
     return [];
   });
 
-  // Load metadata from localStorage or use defaults
-  const [metadata, setMetadata] = useState(() => {
-    const saved = localStorage.getItem("luggageMetadata");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          ...parsed,
-          dateTime: parsed.dateTime || new Date().toLocaleString("es-ES"),
-        };
-      } catch {
-        return {
-          user: "desconocido",
-          shift: "BRC-ERC",
-          airline: "LATAM",
-          dateTime: new Date().toLocaleString("es-ES"),
-        };
-      }
-    }
-    return {
-      user: "desconocido",
-      shift: "BRC-ERC",
-      airline: "LATAM",
-      dateTime: new Date().toLocaleString("es-ES"),
-    };
-  });
-
-  // Image metadata to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("luggageMetadata", JSON.stringify(metadata));
-  }, [metadata]);
-
   // Auto-clear luggageRecords at 23:59:59
   const handleAutoClear = useCallback(() => {
     setRecords([]);
@@ -109,15 +78,30 @@ const Preview = () => {
     });
   }, [records, searchQuery]);
 
-  const handleGenerateImage = async () => {
+  const handleSaveWithMetadata = async (metadata: {
+    user: string;
+    shift: string;
+    airline: string;
+  }) => {
     if (records.length === 0) {
       toast.error("No hay registros para guardar");
       return;
     }
 
-    setIsGenerating(true);
+    setIsSaving(true);
+    setMetadataModalOpen(false);
+
     try {
-      // Wait a bit for barcodes to render
+      // Update report metadata for printable report
+      setReportMetadata({
+        user: metadata.user,
+        shift: metadata.shift,
+        airline: metadata.airline,
+        dateTime: new Date().toLocaleString("es-ES"),
+      });
+
+      // Step 1: Generate image
+      toast.info("Generando imagen...");
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const element = document.getElementById("printable-report");
@@ -147,12 +131,43 @@ const Preview = () => {
       link.href = dataUrl;
       link.click();
 
-      toast.success("Imagen generada exitosamente");
-    } catch (error) {
-      console.error("Error generating image:", error);
-      toast.error("Error al generar la imagen");
+      // Step 2: Send to Supabase
+      toast.info("Enviando a la base de datos...");
+      const transformedRecords = records.map((record) => ({
+        codigo: record.code,
+        categorias: record.categories,
+        observacion: record.observation || null,
+        aerolinea: metadata.airline,
+        fecha_hora: new Date().toISOString(),
+        usuario: metadata.user,
+        turno: metadata.shift,
+        firma: record.has_signature,
+      }));
+
+      const { data, error } = await supabase
+        .from("counter")
+        .insert(transformedRecords)
+        .select();
+
+      if (error) throw error;
+
+      const insertedCount = Array.isArray(data) ? data.length : 0;
+
+      // Step 3: Clear localStorage
+      localStorage.removeItem("luggageRecords");
+      localStorage.removeItem("luggageMetadata");
+
+      // Step 4: Update local state
+      setRecords([]);
+
+      toast.success(
+        `✅ Guardado exitoso: ${insertedCount} ${insertedCount === 1 ? "registro" : "registros"} enviado${insertedCount === 1 ? "" : "s"} a la base de datos`
+      );
+    } catch (error: any) {
+      console.error("Error saving:", error);
+      toast.error(error.message || "Error al guardar los registros");
     } finally {
-      setIsGenerating(false);
+      setIsSaving(false);
     }
   };
 
@@ -214,60 +229,19 @@ const Preview = () => {
     toast.success("Registro eliminado");
   };
 
-  const handleSyncToSupabase = async () => {
+  const handleOpenSaveModal = () => {
     if (records.length === 0) {
-      toast.error("No hay registros para sincronizar");
+      toast.error("No hay registros para guardar");
       return;
     }
-
-    setIsSyncing(true);
-    try {
-      // Transform records to match database schema
-      const transformedRecords = records.map(record => ({
-        codigo: record.code,
-        categorias: record.categories,
-        observacion: record.observation || null,
-        aerolinea: metadata.airline,
-        fecha_hora: new Date().toISOString(),
-        usuario: metadata.user === 'desconocido' ? null : metadata.user,
-        turno: metadata.shift,
-        firma: record.has_signature,
-      }));
-
-      // Insert directly into the counter table
-      const { data, error } = await supabase
-        .from('counter')
-        .insert(transformedRecords)
-        .select();
-
-      if (error) throw error;
-
-      const insertedCount = Array.isArray(data) ? data.length : 0;
-      toast.success(`${insertedCount} registros sincronizados exitosamente`);
-
-      // Optionally clear localStorage after successful sync
-      // localStorage.removeItem("luggageRecords");
-      // localStorage.removeItem("luggageMetadata");
-    } catch (error: any) {
-      console.error("Error syncing to Supabase:", error);
-      toast.error(error.message || "Error al sincronizar con la base de datos");
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  const handleClearAll = () => {
-    localStorage.removeItem("luggageRecords");
-    localStorage.removeItem("luggageMetadata");
-    toast.success("Todos los registros han sido eliminados");
-    navigate("/counter");
+    setMetadataModalOpen(true);
   };
 
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Header */}
-      <header className="bg-card border-b border-border px-4 py-2 shadow-sm">
-        <div className="flex items-center gap-3 mb-1">
+      <header className="bg-card border-b border-border px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
           <Button
             onClick={() => navigate("/counter")}
             variant="ghost"
@@ -285,74 +259,6 @@ const Preview = () => {
               <span>
                 {records.length} {records.length === 1 ? "maleta" : "maletas"}
               </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Metadata Fields */}
-        <div className="space-y-2.5 mb-2">
-          <div className="flex justify-between gap-4">
-            <div>
-              <Label htmlFor="encargado" className="text-xs text-muted-foreground mb-1 block">
-                Encargado
-              </Label>
-              <div className="relative">
-                <User className="absolute left-1.5 top-3 size-4 text-muted-foreground" />
-                <Input
-                  id="encargado"
-                  type="text"
-                  placeholder="Apellido"
-                  value={metadata.user === "desconocido" ? "" : metadata.user}
-                  onChange={(e) =>
-                    setMetadata((prev: typeof metadata) => ({
-                      ...prev,
-                      user: e.target.value.trim() || "desconocido",
-                    }))
-                  }
-                  className="pl-6"
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="turno" className="text-xs text-muted-foreground mb-1 block">
-                Turno
-              </Label>
-              <Select
-                value={metadata.shift}
-                onValueChange={(value) =>
-                  setMetadata((prev: typeof metadata) => ({ ...prev, shift: value }))
-                }
-              >
-                <SelectTrigger id="turno" className="h-9">
-                  <SelectValue placeholder="Turno" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="BRC-ERC">BRC-ERC</SelectItem>
-                  <SelectItem value="IRC-KRC">IRC-KRC</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="aerolinea" className="text-xs text-muted-foreground mb-1 block">
-                Aerolínea
-              </Label>
-              <Select
-                value={metadata.airline}
-                onValueChange={(value) =>
-                  setMetadata((prev: typeof metadata) => ({ ...prev, airline: value }))
-                }
-              >
-                <SelectTrigger id="aerolinea" className="h-9">
-                  <SelectValue placeholder="Aerolínea" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="LATAM">LATAM</SelectItem>
-                  <SelectItem value="SKY">SKY</SelectItem>
-                  <SelectItem value="JET SMART">JET SMART</SelectItem>
-                  <SelectItem value="AVIANCA">AVIANCA</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
         </div>
@@ -399,51 +305,32 @@ const Preview = () => {
       </div>
 
       {/* Fixed Action Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card px-4 shadow-lg">
-        <div className="space-y-2 grid grid-cols-2 gap-x-3">
-            <Button
-              onClick={handleGenerateImage}
-              disabled={isGenerating || records.length === 0}
-              className="flex-1 h-12"
-              size="lg"
-            >
-              <Image className="w-5 h-5 mr-2" />
-              {isGenerating ? "Generando..." : "Guardar"}
-            </Button>
-            <Button
-              onClick={handleClearAll}
-              variant="destructive"
-              className="flex-1 h-12"
-              size="lg"
-            >
-              <Trash2 className="w-5 h-5 mr-2" />
-              Eliminar
-            </Button>
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 shadow-lg">
+        <div className="grid grid-cols-2 gap-3">
           <Button
-            onClick={handleSyncToSupabase}
-            disabled={isSyncing || records.length === 0}
-            className="w-full h-12"
+            onClick={handleOpenSaveModal}
+            disabled={isSaving || records.length === 0}
+            className="h-12"
             size="lg"
-            variant="outline"
           >
-            <Upload className="w-5 h-5 mr-2" />
-            {isSyncing ? "Sincronizando..." : "Enviar"}
+            <Save className="w-5 h-5 mr-2" />
+            {isSaving ? "Guardando..." : "Guardar"}
           </Button>
           <Button
             onClick={() => navigate("/records")}
-            className="w-full h-12"
+            className="h-12"
             size="lg"
             variant="secondary"
           >
             <Database className="w-5 h-5 mr-2" />
-            Ver
+            Ver Registros
           </Button>
         </div>
       </div>
 
       {/* Hidden printable report */}
       <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
-        <PrintableReport records={records} metadata={metadata} />
+        <PrintableReport records={records} metadata={reportMetadata} />
       </div>
 
       {/* Observation Modal */}
@@ -456,6 +343,14 @@ const Preview = () => {
           setObservationModalOpen(false);
           setCurrentEditingCode(null);
         }}
+      />
+
+      {/* Metadata Modal */}
+      <MetadataModal
+        open={metadataModalOpen}
+        recordCount={records.length}
+        onSave={handleSaveWithMetadata}
+        onCancel={() => setMetadataModalOpen(false)}
       />
     </div>
   );

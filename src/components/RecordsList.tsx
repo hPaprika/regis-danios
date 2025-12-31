@@ -28,12 +28,12 @@ export const RecordsList = ({
         <Luggage className="w-16 h-16 text-muted-foreground/40 mb-4" />
         <h3 className="text-lg font-semibold text-foreground mb-2">
           {showSavedMessage && savedRecordCount > 0
-            ? `Tienes ${savedRecordCount} ${savedRecordCount === 1 ? "registro" : "registros"}`
+            ? `${savedRecordCount} ${savedRecordCount === 1 ? "registro guardado" : "registros guardados"}`
             : "No hay maletas escaneadas"}
         </h3>
         <p className="text-sm text-muted-foreground max-w-xs">
           {showSavedMessage && savedRecordCount > 0
-            ? "hasta el momento"
+            ? "en el almacenamiento local"
             : "Apunta la cámara al código de barras de una maleta para comenzar el registro de daños"}
         </p>
       </div>

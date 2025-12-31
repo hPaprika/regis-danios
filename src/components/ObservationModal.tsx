@@ -39,36 +39,20 @@ export const ObservationModal = ({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
             <Label htmlFor="observation">Descripción del daño</Label>
             <Textarea
               id="observation"
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Ej: Rueda rota y rasgado en lateral..."
-              className="min-h-[120px] resize-none"
+              className="min-h-25 resize-none"
               autoFocus
             />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Describe detalladamente los daños observados en la maleta
-          </p>
-        </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            className="w-full sm:w-auto"
-          >
-            Cancelar
-          </Button>
+        <DialogFooter>
           <Button
             type="button"
             onClick={handleSave}
-            className="w-full sm:w-auto"
           >
             Guardar
           </Button>

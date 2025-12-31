@@ -149,17 +149,40 @@ const Index = () => {
         airline: "---",
       };
 
-    // Save to localStorage
-    localStorage.setItem("luggageRecords", JSON.stringify(records));
+    // Load existing saved records
+    const existingSavedRecords = localStorage.getItem("luggageRecords");
+    const previousRecords: LuggageRecord[] = existingSavedRecords
+      ? JSON.parse(existingSavedRecords)
+      : [];
+
+    // Create a Set of existing codes for duplicate detection
+    const existingCodes = new Set(previousRecords.map(r => r.code));
+
+    // Filter out duplicates from current records
+    const newUniqueRecords = records.filter(record => !existingCodes.has(record.code));
+
+    // Combine records: new records first to maintain chronological order (most recent first)
+    const combinedRecords = [...newUniqueRecords, ...previousRecords];
+
+    // Save combined records to localStorage
+    localStorage.setItem("luggageRecords", JSON.stringify(combinedRecords));
     localStorage.setItem("luggageMetadata", JSON.stringify(metadata));
 
-    toast.success(`Datos guardados: ${records.length} maletas guardadas en el dispositivo`);
+    const duplicateCount = records.length - newUniqueRecords.length;
+    if (duplicateCount > 0) {
+      toast.warning(`${newUniqueRecords.length} maletas guardadas. ${duplicateCount} ${duplicateCount === 1 ? 'duplicado omitido' : 'duplicados omitidos'}`);
+    } else {
+      toast.success(`Datos guardados: ${records.length} maletas guardadas en el dispositivo`);
+    }
 
-    console.log("Saved records:", records);
+    console.log("New records:", records);
+    console.log("Unique new records:", newUniqueRecords);
+    console.log("Duplicates filtered:", duplicateCount);
+    console.log("Total records in storage:", combinedRecords.length);
     console.log("Saved metadata:", metadata);
 
     // Clear interface but show saved message
-    setSavedRecordCount(records.length);
+    setSavedRecordCount(combinedRecords.length);
     setShowSavedMessage(true);
     setRecords([]);
     localStorage.removeItem("currentRecords");

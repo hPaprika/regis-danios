@@ -11,7 +11,7 @@ export const CategoryLegend = () => {
     <div className="bg-card rounded-lg p-2 shadow-sm border border-border">
       <div className="flex items-center gap-2 mb-3">
         <Info className="w-4 h-4 text-primary" />
-        <h3 className="text-sm font-semibold text-foreground">Guía de Categorías</h3>
+        <h3 className="text-sm font-semibold text-foreground">Guía de categorías</h3>
       </div>
 
       <div className="flex justify-center gap-1 flex-wrap">

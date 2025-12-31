@@ -27,8 +27,8 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    /// Path mapping
-    //    "ignoreDeprecations": "6.0"    "baseUrl": ".",
+    /* Path mapping */
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"

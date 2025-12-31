@@ -1,6 +1,6 @@
 # Pruebas y Validación
 
-Este documento es la sección oficial de **Pruebas y Validación** para el proyecto. Contiene el detalle de las pruebas planificadas e implementadas (unitarias, de integración y de sistema/E2E), criterios de aceptación y ejemplos de resultados esperados. Está pensado para pegarse tal cual en la documentación del proyecto.
+Este documento es la sección oficial de **Pruebas y Validación** para el proyecto. Contiene el detalle de las pruebas planificadas e implementadas (unitarias, de integración y de sistema/E2E), criterios de aceptación y ejemplos de resultados esperados.
 
 ## Resumen ejecutivo
 

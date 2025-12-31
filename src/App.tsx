@@ -1,6 +1,7 @@
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import CounterPage from "./pages/CounterPage";
@@ -14,6 +15,7 @@ import NotFound from "./pages/NotFound";
 const App = () => (
   <>
     <Sonner />
+    <PWAInstallPrompt />
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />

@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Camera, Home, Scan, Upload, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,6 @@ import { toast } from "sonner";
 
 
 const SiberiaPage = () => {
-  const navigate = useNavigate();
   const [isScanning, setIsScanning] = useState(false);
   const [code, setCode] = useState("");
   const [fullCode, setFullCode] = useState("");
@@ -215,7 +213,7 @@ const SiberiaPage = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/")}
+            onClick={() => "/records"}
             className="text-primary-foreground hover:bg-primary-foreground/20"
           >
             <Home className="w-5 h-5" />
@@ -392,7 +390,7 @@ const SiberiaPage = () => {
         <div className="flex gap-3">
           {/* Botón Ver Registros */}
           <Button
-            onClick={() => navigate("/photolog")}
+            onClick={() => "/records"}
             variant="outline"
             className="flex-1"
             size="lg"

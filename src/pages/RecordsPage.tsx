@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, Search, Camera, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +10,18 @@ import { toast } from "sonner";
  * PhotologPage - Página dedicada para visualizar registros de daños de Siberia
  * Permite navegar por días, buscar registros específicos y ver detalles completos
  */
-const PhotologPage = () => {
-  const navigate = useNavigate();
+const RecordsPage = () => {
+  // navigation helper: prefer global appNavigate, fallback to history
+  const navigateTo = (path: string) => {
+    const p = path.startsWith("/") ? path : `/${path}`;
+    if ((window as any).appNavigate) {
+      (window as any).appNavigate(p);
+      window.dispatchEvent(new Event("app:navigate"));
+      return;
+    }
+    history.pushState({}, "", p);
+    window.dispatchEvent(new Event("app:navigate"));
+  };
 
   // Estado para la fecha seleccionada (por defecto: hoy)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -160,7 +169,7 @@ const PhotologPage = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate("/siberia")}
+              onClick={() => navigateTo("/")}
               className="text-primary-foreground hover:bg-primary-foreground/20"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -333,4 +342,4 @@ const PhotologPage = () => {
   );
 };
 
-export default PhotologPage;
+export default RecordsPage;

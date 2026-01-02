@@ -1,75 +1,31 @@
+import { useEffect, useState } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import CounterPage from "./pages/CounterPage";
-import Preview from "./pages/Preview";
 import SiberiaPage from "./pages/SiberiaPage";
-import PhotologPage from "./pages/PhotologPage";
-import Records from "./pages/Records";
-import NotFound from "./pages/NotFound";
+import RecordsPage from "./pages/RecordsPage";
 
+const App = () => {
+  const [route, setRoute] = useState<"siberia" | "records">("siberia");
 
-const App = () => (
-  <>
-    <Sonner />
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Index />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/counter"
-          element={
-            <ProtectedRoute>
-              <CounterPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/preview"
-          element={
-            <ProtectedRoute>
-              <Preview />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/siberia"
-          element={
-            <ProtectedRoute>
-              <SiberiaPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/photolog"
-          element={
-            <ProtectedRoute>
-              <PhotologPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/records"
-          element={
-            <ProtectedRoute>
-              <Records />
-            </ProtectedRoute>
-          }
-        />
+  useEffect(() => {
+    // minimal navigation API: window.appNavigate(path)
+    (window as any).appNavigate = (path: string) => {
+      const p = path.startsWith("/") ? path : `/${path}`;
+      setRoute(p === "/records" ? "records" : "siberia");
+    };
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  </>
-);
+    return () => {
+      try {
+        delete (window as any).appNavigate;
+      } catch { }
+    };
+  }, []);
+
+  return (
+    <>
+      <Sonner />
+      {route === "records" ? <RecordsPage /> : <SiberiaPage />}
+    </>
+  );
+};
 
 export default App;

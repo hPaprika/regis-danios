@@ -1,30 +1,44 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, Search, Camera, List } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Search, Camera, List} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { navigateTo } from "@/utils/navigation";
 
 /**
- * PhotologPage - Página dedicada para visualizar registros de daños de Siberia
+ * RecordsPage - Página dedicada para visualizar registros de daños de Siberia
  * Permite navegar por días, buscar registros específicos y ver detalles completos
  */
 const RecordsPage = () => {
-  // navigation helper: prefer global appNavigate, fallback to history
-  const navigateTo = (path: string) => {
-    const p = path.startsWith("/") ? path : `/${path}`;
-    if ((window as any).appNavigate) {
-      (window as any).appNavigate(p);
-      window.dispatchEvent(new Event("app:navigate"));
-      return;
-    }
-    history.pushState({}, "", p);
-    window.dispatchEvent(new Event("app:navigate"));
-  };
 
   // Estado para la fecha seleccionada (por defecto: hoy)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  // Preview maximizada de imagen
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+
+  const openPreview = (src: string) => {
+    setPreviewSrc(src);
+    setPreviewOpen(true);
+  };
+
+  const closePreview = () => {
+    setPreviewOpen(false);
+    setPreviewSrc(null);
+  };
+
+  // cerrar con ESC
+  useEffect(() => {
+    if (!previewOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closePreview();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [previewOpen]);
 
   // Estado para los registros del día
   const [records, setRecords] = useState<any[]>([]);
@@ -230,7 +244,7 @@ const RecordsPage = () => {
                     className="border rounded-lg p-4 space-y-3 bg-card shadow-sm hover:shadow-md transition-shadow"
                   >
                     {/* Información del registro */}
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                    <div className="grid grid-cols-2 gap-y-2 text-sm">
                       <div>
                         <span className="font-medium text-muted-foreground">Código:</span>{" "}
                         <span className="font-semibold">{record.codigo}</span>
@@ -267,7 +281,8 @@ const RecordsPage = () => {
                         <img
                           src={record.imagen_url}
                           alt={`Daño ${record.codigo}`}
-                          className="w-full h-64 object-cover rounded-lg border"
+                          className="w-full h-64 object-cover rounded-lg border cursor-pointer hover:opacity-95"
+                          onClick={() => openPreview(record.imagen_url)}
                         />
                       </div>
                     )}
@@ -278,6 +293,23 @@ const RecordsPage = () => {
           </div>
         </ScrollArea>
       </div>
+
+      {/* Overlay preview maximizada */}
+      {previewOpen && previewSrc && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={closePreview}
+        >
+          <div className="relative max-w-[98%] max-h-[98%]">
+            <img
+              src={previewSrc}
+              alt="Preview"
+              className="max-w-full max-h-[80vh] object-contain rounded"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Footer - Navegación de días */}
       <footer className="fixed bottom-0 left-0 right-0 bg-card border-t px-4 py-3 shadow-lg">

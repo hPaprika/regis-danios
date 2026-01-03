@@ -1,31 +1,57 @@
-import { useEffect, useState } from "react";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import SiberiaPage from "./pages/SiberiaPage";
-import RecordsPage from "./pages/RecordsPage";
+import { useState, useEffect } from "react";
+import SiberiaPage from "@/pages/SiberiaPage";
+import RecordsPage from "@/pages/RecordsPage";
 
+/**
+ * Simple Router Component
+ * Maneja la navegación entre páginas sin librerías externas
+ */
 const App = () => {
-  const [route, setRoute] = useState<"siberia" | "records">("siberia");
+  // Estado para la ruta actual
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
+  // Efecto para escuchar cambios en el historial del navegador
   useEffect(() => {
-    // minimal navigation API: window.appNavigate(path)
-    (window as any).appNavigate = (path: string) => {
-      const p = path.startsWith("/") ? path : `/${path}`;
-      setRoute(p === "/records" ? "records" : "siberia");
+    // Función que actualiza la ruta cuando el usuario usa los botones del navegador
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
     };
 
+    // Escuchar eventos de navegación del navegador (back/forward)
+    window.addEventListener("popstate", handlePopState);
+
+    // Cleanup: remover el listener cuando el componente se desmonte
     return () => {
-      try {
-        delete (window as any).appNavigate;
-      } catch { }
+      window.removeEventListener("popstate", handlePopState);
     };
   }, []);
 
-  return (
-    <>
-      <Sonner />
-      {route === "records" ? <RecordsPage /> : <SiberiaPage />}
-    </>
-  );
+  // Función de navegación global que se puede usar desde cualquier componente
+  useEffect(() => {
+    // Exponer función de navegación globalmente
+    (window as any).navigateTo = (path: string) => {
+      // Actualizar el historial del navegador
+      window.history.pushState({}, "", path);
+      // Actualizar el estado local para re-renderizar
+      setCurrentPath(path);
+    };
+  }, []);
+
+  // Renderizar el componente correspondiente según la ruta
+  const renderPage = () => {
+    switch (currentPath) {
+      case "/":
+        return <SiberiaPage />;
+      case "/records":
+        return <RecordsPage />;
+      default:
+        // Si la ruta no existe, redirigir a la página principal
+        window.history.replaceState({}, "", "/");
+        return <SiberiaPage />;
+    }
+  };
+
+  return renderPage();
 };
 
 export default App;

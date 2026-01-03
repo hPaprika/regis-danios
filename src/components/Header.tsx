@@ -1,9 +1,18 @@
 import { ScanBarcode, Home } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+// header uses hash navigation now
 import { Button } from "@/components/ui/button";
 
 export const Header = () => {
-  const navigate = useNavigate();
+  const navigateTo = (path: string) => {
+    const p = path.startsWith("/") ? path : `/${path}`;
+    if ((window as any).appNavigate) {
+      (window as any).appNavigate(p);
+      window.dispatchEvent(new Event("app:navigate"));
+      return;
+    }
+    history.pushState({}, "", p);
+    window.dispatchEvent(new Event("app:navigate"));
+  };
 
   return (
     <header className="bg-primary text-primary-foreground w-full px-4 py-2 shadow-md">
@@ -18,7 +27,7 @@ export const Header = () => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate("/")}
+          onClick={() => navigateTo("/")}
           className="text-primary-foreground hover:bg-primary-foreground/20"
         >
           <Home className="w-5 h-5" />

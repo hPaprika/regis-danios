@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Camera, Home, Scan, Upload, X, FileText } from "lucide-react";
+import { Camera, ScanBarcode, Upload, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,22 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScannerView } from "@/components/ScannerView";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
+import { navigateTo } from "@/utils/navigation";
+import flights from "@/data/flights.json";
 
 const SiberiaPage = () => {
-  const navigate = useNavigate();
   const [isScanning, setIsScanning] = useState(false);
   const [code, setCode] = useState("");
   const [fullCode, setFullCode] = useState("");
   const [flightNumber, setFlightNumber] = useState("");
-  const [hasSignature, setHasSignature] = useState(false);
+  const [hasSignature, setHasSignature] = useState(true);
   const [observations, setObservations] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const commonFlights = ["2328", "2010", "2366"];
+  const commonFlights = flights as string[];
 
   // Helper: compress image using canvas (client-side)
   const compressImage = async (
@@ -71,7 +70,6 @@ const SiberiaPage = () => {
 
   const handleScan = (scannedCode: string, isSuccess: boolean) => {
     if (isSuccess && scannedCode) {
-      // Save full code internally, display last 6 digits
       setFullCode(scannedCode);
       setCode(scannedCode.slice(-6));
       setIsScanning(false);
@@ -185,7 +183,7 @@ const SiberiaPage = () => {
       setCode("");
       setFullCode("");
       setFlightNumber("");
-      setHasSignature(false);
+      setHasSignature(true);
       setObservations("");
       setPhotoFile(null);
       setPhotoPreview(null);
@@ -201,46 +199,57 @@ const SiberiaPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-primary text-primary-foreground px-4 py-4 shadow-md">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Camera className="w-6 h-6" />
-            <div>
-              <h1 className="text-xl font-bold">Siberia - Registro de Daños</h1>
-              <p className="text-sm opacity-90">Escanea y documenta el daño</p>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/")}
-            className="text-primary-foreground hover:bg-primary-foreground/20"
-          >
-            <Home className="w-5 h-5" />
-          </Button>
-        </div>
+      <header className="bg-primary text-primary-foreground py-2 shadow-md">
+        <h1 className="text-xl font-bold text-center">Registro de Daños</h1>
+        <p className="text-sm opacity-90 text-center">Escanea y documenta el daño</p>
       </header>
 
-      {/* Scanner View (only when scanning) */}
+      {/* Scanner Modal (only when scanning) */}
       {isScanning && (
-        <div className="relative">
-          <ScannerView onScan={handleScan} showManualButton={false} />
-          <Button
-            variant="destructive"
-            className="absolute bottom-4 right-4 z-10"
-            onClick={() => setIsScanning(false)}
-          >
-            <X className="w-4 h-4 mr-2" />
-            Cancelar
-          </Button>
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+          <div className="w-full max-w-[390px] relative px-4 py-8">
+            {/* Title */}
+            <h1 className="text-white text-xl font-semibold text-center mb-8">
+              Escanear código
+            </h1>
+
+            {/* Scanner Frame Container - Centered */}
+            <div className="flex justify-center mb-8">
+              <div className="relative w-[300px] h-[300px] overflow-hidden rounded-lg">
+                {/* Scanner View Component - Visible with camera */}
+                <div className="absolute inset-0">
+                  <ScannerView onScan={handleScan} showManualButton={false} hideUI={true} />
+                </div>
+
+                {/* Corner Borders - z-index higher to appear on top */}
+                <div className="absolute top-0 left-0 w-[45px] h-[45px] border-t-[3px] border-l-[3px] border-white z-20 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-[45px] h-[45px] border-t-[3px] border-r-[3px] border-white z-20 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-[45px] h-[45px] border-b-[3px] border-l-[3px] border-white z-20 pointer-events-none"></div>
+                <div className="absolute bottom-0 right-0 w-[45px] h-[45px] border-b-[3px] border-r-[3px] border-white z-20 pointer-events-none"></div>
+              </div>
+            </div>
+
+            {/* Cancel Button */}
+            <div className="flex justify-center">
+              <Button
+                variant="destructive"
+                onClick={() => setIsScanning(false)}
+                className="px-6"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Cancelar
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Main Form */}
-      {!isScanning && (
-        <div className="p-6 max-w-md mx-auto space-y-6">
+      <div className="flex-1 overflow-auto">
+        {!isScanning && (
+          <div className="p-6 max-w-md mx-auto space-y-6 pb-24">
           {/* Code Section */}
           <div className="space-y-3">
             <Label htmlFor="code">Código de Maleta</Label>
@@ -252,6 +261,7 @@ const SiberiaPage = () => {
                 pattern="\d*"
                 inputMode="numeric"
                 placeholder="000000"
+                autoComplete="off"
                 value={code}
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "");
@@ -267,7 +277,7 @@ const SiberiaPage = () => {
                 onClick={() => setIsScanning(true)}
                 disabled={isUploading}
               >
-                <Scan className="w-4 h-4" />
+                <ScanBarcode className="w-4 h-4" />
               </Button>
             </div>
           </div>
@@ -373,8 +383,9 @@ const SiberiaPage = () => {
               className="min-h-24 resize-none"
             />
           </div>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
       {/* Loading Overlay */}
       {isUploading && (
@@ -388,11 +399,11 @@ const SiberiaPage = () => {
       )}
 
       {/* Footer - Botones de acción */}
-      <footer className="bg-card border-t px-4 py-4 shadow-lg">
+      <footer className="fixed bottom-0 left-0 right-0 z-40 bg-card border-t px-4 py-4 shadow-lg">
         <div className="flex gap-3">
           {/* Botón Ver Registros */}
           <Button
-            onClick={() => navigate("/photolog")}
+            onClick={() => navigateTo("/records")}
             variant="outline"
             className="flex-1"
             size="lg"
@@ -408,7 +419,7 @@ const SiberiaPage = () => {
             size="lg"
           >
             <Upload className="w-5 h-5 mr-2" />
-            Confirmar
+            Enviar
           </Button>
         </div>
       </footer>

@@ -8,9 +8,10 @@ interface ScannerViewProps {
   onScan: (code: string, isSuccess: boolean) => void;
   showManualButton?: boolean;
   onManualClick?: () => void;
+  hideUI?: boolean; // Nueva prop para ocultar los overlays
 }
 
-export const ScannerView = ({ onScan, showManualButton = true, onManualClick }: ScannerViewProps) => {
+export const ScannerView = ({ onScan, showManualButton = true, onManualClick, hideUI = false }: ScannerViewProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<string>("Inicializando cámara...");
   const [lastScanned, setLastScanned] = useState<string>("");
@@ -115,52 +116,56 @@ export const ScannerView = ({ onScan, showManualButton = true, onManualClick }: 
     <div className="relative bg-black">
       <video
         ref={videoRef}
-        className="w-full h-64 object-cover"
+        className={hideUI ? "w-full h-full object-cover" : "w-full h-64 object-cover"}
         autoPlay
         playsInline
         muted
         preload="auto"
-        style={{ backgroundColor: 'black' }}
       />
 
-      {/* Scanner overlay */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-3/4 h-32 border-2 border-primary rounded-lg shadow-lg">
-          <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-primary z-10"></div>
-          <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-primary z-10"></div>
-          <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-primary"></div>
-          <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-primary"></div>
-        </div>
-      </div>
+      {/* Solo mostrar overlays si hideUI es false */}
+      {!hideUI && (
+        <>
+          {/* Scanner overlay */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-3/4 h-32 border-2 border-primary rounded-lg shadow-lg">
+              <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-primary z-10"></div>
+              <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-primary z-10"></div>
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-primary"></div>
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-primary"></div>
+            </div>
+          </div>
 
-      {/* Status bar at top */}
-      <div className="absolute top-0 left-0 right-0 bg-black/60 backdrop-blur-sm px-4 py-2">
-        <p className="text-white text-sm text-center flex items-center justify-center gap-2">
-          <Camera className="w-4 h-4" />
-          {status}
-        </p>
-      </div>
+          {/* Status bar at top */}
+          <div className="absolute top-0 left-0 right-0 bg-black/60 backdrop-blur-sm px-4 py-2">
+            <p className="text-white text-sm text-center flex items-center justify-center gap-2">
+              <Camera className="w-4 h-4" />
+              {status}
+            </p>
+          </div>
 
-      {/* Last scanned code overlay at bottom */}
-      {lastScanned && (
-        <div className="absolute bottom-0 left-0 right-0 bg-accent/90 backdrop-blur-sm px-4 py-3 animate-fade-in">
-          <p className="text-white text-center font-medium">
-            Escaneado: <span className="font-bold">{lastScanned}</span>
-          </p>
-        </div>
-      )}
+          {/* Last scanned code overlay at bottom */}
+          {lastScanned && (
+            <div className="absolute bottom-0 left-0 right-0 bg-accent/90 backdrop-blur-sm px-4 py-3 animate-fade-in">
+              <p className="text-white text-center font-medium">
+                Escaneado: <span className="font-bold">{lastScanned}</span>
+              </p>
+            </div>
+          )}
 
-      {/* Floating manual code button */}
-      {showManualButton && onManualClick && (
-        <div className="absolute bottom-4 right-4 z-10">
-          <Button
-            onClick={onManualClick}
-            variant="secondary"
-            className="shadow-lg border-2 border-black/80 bg-secondary/70"
-          >
-            <Keyboard className="w-4 h-4 opacity-100" />
-          </Button>
-        </div>
+          {/* Floating manual code button */}
+          {showManualButton && onManualClick && (
+            <div className="absolute bottom-4 right-4 z-10">
+              <Button
+                onClick={onManualClick}
+                variant="secondary"
+                className="shadow-lg border-2 border-black/80 bg-secondary/70"
+              >
+                <Keyboard className="w-4 h-4 opacity-100" />
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

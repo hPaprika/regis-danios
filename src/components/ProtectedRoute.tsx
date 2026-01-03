@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+// import { Navigate } from "react-router-dom"; // No instalado - sistema usa solo 2 páginas
 import { supabase } from "@/integrations/supabase/client";
 import { type Session } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
@@ -39,7 +39,8 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!session) {
-    return <Navigate to="/login" replace />;
+    // return <Navigate to="/login" replace />;
+    return null; // Componente no usado - sistema maneja 2 páginas sin router
   }
 
   return <>{children}</>;

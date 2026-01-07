@@ -68,6 +68,7 @@ const SiberiaPage = () => {
     });
   }
 
+  // Handle scan result from ScannerView
   const handleScan = (scannedCode: string, isSuccess: boolean) => {
     if (isSuccess && scannedCode) {
       setFullCode(scannedCode);
@@ -77,6 +78,7 @@ const SiberiaPage = () => {
     }
   };
 
+  // Handle photo capture from file input
   const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -95,6 +97,7 @@ const SiberiaPage = () => {
     }
   };
 
+  // Handle retake photo action
   const handleRetakePhoto = () => {
     setPhotoFile(null);
     setPhotoPreview(null);
@@ -103,6 +106,13 @@ const SiberiaPage = () => {
     }
   };
 
+  const getDefaultShift = (): string => {
+    const now = new Date();
+    const hour = now.getHours();
+    return hour >= 4 && hour < 13 ? "BRC-ERC" : "IRC-KRC";
+  };
+
+  // Handle form submission
   const handleSubmit = async () => {
     // Validate all fields
     if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
@@ -160,6 +170,7 @@ const SiberiaPage = () => {
           imagen_url: urlData.publicUrl,
           observacion: observations || null,
           fecha_hora: new Date().toISOString(),
+          turno: getDefaultShift(),
         });
 
       if (dbError) {
@@ -197,6 +208,7 @@ const SiberiaPage = () => {
       setIsUploading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -250,139 +262,139 @@ const SiberiaPage = () => {
       <div className="flex-1 overflow-auto">
         {!isScanning && (
           <div className="p-6 max-w-md mx-auto space-y-6 pb-24">
-          {/* Code Section */}
-          <div className="space-y-3">
-            <Label htmlFor="code">Código de Maleta</Label>
-            <div className="flex gap-2">
-              <Input
-                id="code"
-                type="text"
-                maxLength={6}
-                pattern="\d*"
-                inputMode="numeric"
-                placeholder="000000"
-                autoComplete="off"
-                value={code}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "");
-                  setCode(value);
-                  setFullCode(value);
-                }}
-                className="text-lg text-center tracking-wider"
-                disabled={isUploading}
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setIsScanning(true)}
-                disabled={isUploading}
-              >
-                <ScanBarcode className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Flight Number */}
-          <div className="space-y-2">
-            <Label htmlFor="flight">Número de Vuelo</Label>
-            <Input
-              id="flight"
-              type="text"
-              maxLength={4}
-              pattern="\d*"
-              inputMode="numeric"
-              placeholder="0000"
-              list="common-flights"
-              value={flightNumber}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "");
-                setFlightNumber(value);
-              }}
-              className="text-lg text-center tracking-wider"
-              disabled={isUploading}
-            />
-            <datalist id="common-flights">
-              {commonFlights.map((flight) => (
-                <option key={flight} value={flight} />
-              ))}
-            </datalist>
-          </div>
-
-          {/* Signature Toggle */}
-          <div className="flex items-center space-x-2 py-2">
-            <Checkbox
-              id="signature"
-              checked={hasSignature}
-              onCheckedChange={(checked) => setHasSignature(checked as boolean)}
-              disabled={isUploading}
-            />
-            <Label
-              htmlFor="signature"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              ¿Tiene firma del pasajero?
-            </Label>
-          </div>
-
-          <div className="space-y-3">
-            <Label>Foto del Daño</Label>
-
-            {!photoPreview ? (
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                {/* Input único que abre cámara pero permite cambiar a galería */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={handlePhotoCapture}
-                  className="hidden"
+            {/* Code Section */}
+            <div className="space-y-3">
+              <Label htmlFor="code">Código de Maleta</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="code"
+                  type="text"
+                  maxLength={6}
+                  pattern="\d*"
+                  inputMode="numeric"
+                  placeholder="000000"
+                  autoComplete="off"
+                  value={code}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setCode(value);
+                    setFullCode(value);
+                  }}
+                  className="text-lg text-center tracking-wider"
                   disabled={isUploading}
                 />
                 <Button
                   variant="outline"
-                  className="w-full"
-                  onClick={() => fileInputRef.current?.click()}
+                  size="icon"
+                  onClick={() => setIsScanning(true)}
                   disabled={isUploading}
                 >
-                  <Camera className="w-4 h-4 mr-2" />
-                  Cargar Foto
+                  <ScanBarcode className="w-4 h-4" />
                 </Button>
               </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="relative border rounded-lg overflow-hidden">
-                  <img
-                    src={photoPreview}
-                    alt="Preview"
-                    className="w-full h-64 object-cover"
+            </div>
+
+            {/* Flight Number */}
+            <div className="space-y-2">
+              <Label htmlFor="flight">Número de Vuelo</Label>
+              <Input
+                id="flight"
+                type="text"
+                maxLength={4}
+                pattern="\d*"
+                inputMode="numeric"
+                placeholder="0000"
+                list="common-flights"
+                value={flightNumber}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setFlightNumber(value);
+                }}
+                className="text-lg text-center tracking-wider"
+                disabled={isUploading}
+              />
+              <datalist id="common-flights">
+                {commonFlights.map((flight) => (
+                  <option key={flight} value={flight} />
+                ))}
+              </datalist>
+            </div>
+
+            {/* Signature Toggle */}
+            <div className="flex items-center space-x-2 py-2">
+              <Checkbox
+                id="signature"
+                checked={hasSignature}
+                onCheckedChange={(checked) => setHasSignature(checked as boolean)}
+                disabled={isUploading}
+              />
+              <Label
+                htmlFor="signature"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                ¿Tiene firma del pasajero?
+              </Label>
+            </div>
+
+            <div className="space-y-3">
+              <Label>Foto del Daño</Label>
+
+              {!photoPreview ? (
+                <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                  {/* Input único que abre cámara pero permite cambiar a galería */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handlePhotoCapture}
+                    className="hidden"
+                    disabled={isUploading}
                   />
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Cargar Foto
+                  </Button>
                 </div>
-                {/* Botón Retomar (ancho completo) */}
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleRetakePhoto}
-                  disabled={isUploading}
-                >
-                  <Camera className="w-4 h-4 mr-2" />
-                  Cancelar
-                </Button>
-              </div>
-            )}
-          </div>
-          {/* Observations */}
-          <div className="space-y-2">
-            <Label htmlFor="observations">Observaciones</Label>
-            <Textarea
-              id="observations"
-              placeholder="Ingrese observaciones sobre el daño..."
-              value={observations}
-              onChange={(e) => setObservations(e.target.value)}
-              disabled={isUploading}
-              className="min-h-24 resize-none"
-            />
-          </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="relative border rounded-lg overflow-hidden">
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="w-full h-64 object-cover"
+                    />
+                  </div>
+                  {/* Botón Retomar (ancho completo) */}
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleRetakePhoto}
+                    disabled={isUploading}
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Cancelar
+                  </Button>
+                </div>
+              )}
+            </div>
+            {/* Observations */}
+            <div className="space-y-2">
+              <Label htmlFor="observations">Observaciones</Label>
+              <Textarea
+                id="observations"
+                placeholder="Ingrese observaciones sobre el daño..."
+                value={observations}
+                onChange={(e) => setObservations(e.target.value)}
+                disabled={isUploading}
+                className="min-h-24 resize-none"
+              />
+            </div>
           </div>
         )}
       </div>

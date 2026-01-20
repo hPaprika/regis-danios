@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Camera, ScanBarcode, Upload, X, FileText } from "lucide-react";
+import { Camera, ScanBarcode, Upload, X, FileText,Minus, ImagePlus as ImageUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,10 +22,10 @@ const SiberiaPage = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputGalleryRef = useRef<HTMLInputElement>(null);
 
   const commonFlights = flights as string[];
 
-  // Helper: compress image using canvas (client-side)
   const compressImage = async (
     file: File,
     maxWidth = 1280,
@@ -68,7 +68,6 @@ const SiberiaPage = () => {
     });
   }
 
-  // Handle scan result from ScannerView
   const handleScan = (scannedCode: string, isSuccess: boolean) => {
     if (isSuccess && scannedCode) {
       setFullCode(scannedCode);
@@ -78,7 +77,6 @@ const SiberiaPage = () => {
     }
   };
 
-  // Handle photo capture from file input
   const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -97,7 +95,6 @@ const SiberiaPage = () => {
     }
   };
 
-  // Handle retake photo action
   const handleRetakePhoto = () => {
     setPhotoFile(null);
     setPhotoPreview(null);
@@ -112,9 +109,7 @@ const SiberiaPage = () => {
     return hour >= 4 && hour < 13 ? "BRC-ERC" : "IRC-KRC";
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
-    // Validate all fields
     if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
       toast.error("El código debe tener exactamente 6 dígitos numéricos");
       return;
@@ -133,14 +128,12 @@ const SiberiaPage = () => {
     setIsUploading(true);
 
     try {
-      // 1. Compress/convert image before upload (convert to jpeg by default)
-      const outputType = "image/jpeg"; // change to 'image/png' if transparency needed
+      const outputType = "image/jpeg";
       const compressedBlob = await compressImage(photoFile, 1280, 1280, 0.75, outputType);
       const extension = String(outputType).startsWith("image/png") ? "png" : "jpg";
       const photoFileName = `${Date.now()}_${code}.${extension}`;
       const uploadFile = new File([compressedBlob], photoFileName, { type: outputType });
 
-      // 2. Upload compressed photo to storage
       const { error: uploadError } = await supabase.storage
         .from("siberia_photos")
         .upload(photoFileName, uploadFile, {
@@ -155,12 +148,10 @@ const SiberiaPage = () => {
         return;
       }
 
-      // 3. Get public URL of the photo
       const { data: urlData } = supabase.storage
         .from("siberia_photos")
         .getPublicUrl(photoFileName);
 
-      // 4. Insert record into database
       const { error: dbError } = await supabase
         .from("siberia")
         .insert({
@@ -176,7 +167,6 @@ const SiberiaPage = () => {
       if (dbError) {
         console.error("Error inserting record:", dbError);
         toast.error(`Error al guardar el registro: ${dbError.message}`);
-        // Photo is already in storage: remove it to avoid orphan files
         try {
           const { error: removeError } = await supabase.storage.from("siberia_photos").remove([photoFileName]);
           if (removeError) console.warn('Failed to remove uploaded photo after DB error:', removeError, fullCode);
@@ -187,10 +177,8 @@ const SiberiaPage = () => {
         return;
       }
 
-      // Success!
       toast.success("¡Registro exitoso! El daño de maleta ha sido registrado correctamente");
 
-      // Clear form
       setCode("");
       setFullCode("");
       setFlightNumber("");
@@ -250,7 +238,7 @@ const SiberiaPage = () => {
                 onClick={() => setIsScanning(false)}
                 className="px-6"
               >
-                <X className="w-4 h-4 mr-2" />
+                <X className="w-4 h-4" />
                 Cancelar
               </Button>
             </div>
@@ -341,12 +329,19 @@ const SiberiaPage = () => {
 
               {!photoPreview ? (
                 <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                  {/* Input único que abre cámara pero permite cambiar a galería */}
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept="image/*"
                     capture="environment"
+                    onChange={handlePhotoCapture}
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+                  <input
+                    ref={fileInputGalleryRef}
+                    type="file"
+                    accept="image/*"
                     onChange={handlePhotoCapture}
                     className="hidden"
                     disabled={isUploading}
@@ -358,7 +353,19 @@ const SiberiaPage = () => {
                     disabled={isUploading}
                   >
                     <Camera className="w-4 h-4 mr-2" />
-                    Cargar Foto
+                    Tomar Foto
+                  </Button>
+                  <div className="flex justify-center my-2 text-muted-foreground">
+                    <Minus /> o <Minus />
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => fileInputGalleryRef.current?.click()}
+                    disabled={isUploading}
+                  >
+                    <ImageUp className="w-4 h-4 mr-2" />
+                    Subir Foto
                   </Button>
                 </div>
               ) : (
@@ -370,14 +377,13 @@ const SiberiaPage = () => {
                       className="w-full h-64 object-cover"
                     />
                   </div>
-                  {/* Botón Retomar (ancho completo) */}
                   <Button
                     variant="outline"
                     className="w-full"
                     onClick={handleRetakePhoto}
                     disabled={isUploading}
                   >
-                    <Camera className="w-4 h-4 mr-2" />
+                    <X className="w-4 h-4" />
                     Cancelar
                   </Button>
                 </div>

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Camera, ScanBarcode, Upload, X, FileText,Minus, ImagePlus as ImageUp } from "lucide-react";
+import { Camera, ScanBarcode, Upload, X, FileText, Minus, ImagePlus as ImageUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,7 +46,6 @@ const SiberiaPage = () => {
           canvas.height = Math.round(height * ratio);
           const ctx = canvas.getContext("2d");
           if (!ctx) return reject(new Error("Canvas not supported"));
-          // If converting to jpeg, paint white background to avoid black on transparency
           if (outputType === "image/jpeg") {
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -80,7 +79,6 @@ const SiberiaPage = () => {
   const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate it's an image
       if (!file.type.startsWith("image/")) {
         toast.error("Solo se permiten archivos de imagen");
         return;
@@ -104,9 +102,12 @@ const SiberiaPage = () => {
   };
 
   const getDefaultShift = (): string => {
-    const now = new Date();
-    const hour = now.getHours();
-    return hour >= 4 && hour < 13 ? "BRC-ERC" : "IRC-KRC";
+    const hour = new Date().getHours();
+    return hour >= 4 && hour < 13
+      ? "BRC-ERC"
+      : hour >= 13
+        ? "IRC-KRC"
+        : "ZRC-ARC";
   };
 
   const handleSubmit = async () => {
@@ -191,6 +192,7 @@ const SiberiaPage = () => {
       }
     } catch (error) {
       console.error("Unexpected error:", error);
+      // TODO: mostrar mensaje más específico según el error TOAST
       toast.error("Error inesperado al procesar el registro");
     } finally {
       setIsUploading(false);

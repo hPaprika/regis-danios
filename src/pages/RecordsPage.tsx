@@ -7,16 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { navigateTo } from "@/utils/navigation";
 
-/**
- * RecordsPage - Página dedicada para visualizar registros de daños de Siberia
- * Permite navegar por días, buscar registros específicos y ver detalles completos
- */
 const RecordsPage = () => {
-
-  // Estado para la fecha seleccionada (por defecto: hoy)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  // Preview maximizada de imagen
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
@@ -30,7 +22,6 @@ const RecordsPage = () => {
     setPreviewSrc(null);
   };
 
-  // cerrar con ESC
   useEffect(() => {
     if (!previewOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -40,23 +31,11 @@ const RecordsPage = () => {
     return () => window.removeEventListener("keydown", onKey);
   }, [previewOpen]);
 
-  // Estado para los registros del día
   const [records, setRecords] = useState<any[]>([]);
-
-  // Estado para el término de búsqueda
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Estado de carga
   const [isLoading, setIsLoading] = useState(false);
-
-  // Estado para mostrar todos los registros (sin filtro de fecha)
   const [showAll, setShowAll] = useState(false);
 
-  /**
-   * Función para obtener registros de Supabase
-   * Filtra por fecha seleccionada y término de búsqueda
-   * Si showAll es true, muestra todos los registros sin filtro de fecha
-   */
   const fetchRecords = async () => {
     setIsLoading(true);
     try {
@@ -65,9 +44,7 @@ const RecordsPage = () => {
         .select("*")
         .order("created_at", { ascending: false });
 
-      // Si no está en modo "Ver todo", filtrar por fecha
       if (!showAll) {
-        // Calcular inicio y fin del día seleccionado
         const startOfDay = new Date(selectedDate);
         startOfDay.setHours(0, 0, 0, 0);
 
@@ -83,7 +60,6 @@ const RecordsPage = () => {
 
       if (error) throw error;
 
-      // Filtrar por búsqueda en el cliente (código, vuelo, observaciones)
       let filteredData = data || [];
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
@@ -104,41 +80,26 @@ const RecordsPage = () => {
     }
   };
 
-  /**
-   * Efecto para cargar registros cuando cambia la fecha, búsqueda o modo showAll
-   */
   useEffect(() => {
     fetchRecords();
   }, [selectedDate, searchQuery, showAll]);
 
-  /**
-   * Navegar al día anterior
-   */
   const handlePreviousDay = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() - 1);
     setSelectedDate(newDate);
   };
 
-  /**
-   * Navegar al día siguiente
-   */
   const handleNextDay = () => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + 1);
     setSelectedDate(newDate);
   };
 
-  /**
-   * Activar modo "Ver todo" para mostrar todos los registros
-   */
   const handleShowAll = () => {
     setShowAll(true);
   };
 
-  /**
-   * Formatear fecha para mostrar
-   */
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("es-PE", {
       weekday: "long",
@@ -147,9 +108,6 @@ const RecordsPage = () => {
     });
   };
 
-  /**
-   * Mostrar fecha corta y hora: ej. '26/12/25, 15:37'
-   */
   const showShortDate = (input: string | Date) => {
     const d = new Date(input);
     return d.toLocaleString("es-PE", {
@@ -162,9 +120,6 @@ const RecordsPage = () => {
     });
   };
 
-  /**
-   * Verificar si la fecha seleccionada es hoy
-   */
   const isToday = () => {
     const today = new Date();
     return (
@@ -281,6 +236,7 @@ const RecordsPage = () => {
                         <img
                           src={record.imagen_url}
                           alt={`Daño ${record.codigo}`}
+                          loading="lazy"
                           className="w-full h-64 object-cover rounded-lg border cursor-pointer hover:opacity-95"
                           onClick={() => openPreview(record.imagen_url)}
                         />
